@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <!-- Enlace al CSS -->
+<<<<<<< Updated upstream
     <link rel="stylesheet" href="/Assets/Css/styles.css">
+=======
+    <link rel="stylesheet" href="Assets/Css/styles.css">
+>>>>>>> Stashed changes
 </head>
 <body>
     <div class="login-page">
