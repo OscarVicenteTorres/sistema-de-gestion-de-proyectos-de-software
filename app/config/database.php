@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = "localhost";
-    private $db_name = "mi_base";
+    private $db_name = "project_management";
     private $username = "root"; // en XAMPP normalmente es root
     private $password = "";     // en XAMPP normalmente sin contraseña
     public $conn;

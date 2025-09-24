@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <!-- Enlace al CSS -->
-    <link rel="stylesheet" href="/Assets/Css/styles.css">
+    <!-- Enlace al CSS: revisa que la ruta y mayúsculas coincidan exactamente -->
+    <link rel="stylesheet" href="/sistema-de-gestion-de-proyectos-de-software/Assets/Css/styles.css">
 </head>
 <body>
     <div class="login-page">
@@ -33,7 +33,7 @@
 
                 <!-- Botón único de inicio de sesión -->
                 <div class="btn-row">
-                    <button type="submit" class="btn">Iniciar Sesión</button>
+                    <input name="btningresar" class="btn" type="submit" value="Iniciar Sesión">
                 </div>
 
                 <!-- Mensaje de error -->

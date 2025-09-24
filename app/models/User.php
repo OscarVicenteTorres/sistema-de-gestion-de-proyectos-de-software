@@ -2,7 +2,7 @@
 class User
 {
     private $conn;
-    private $table_name = "users";
+    private $table_name = "usuarios";
 
     public function __construct($db)
     {
@@ -11,17 +11,19 @@ class User
 
     public function login($email, $password)
     {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
+        // OJO: la columna en la BD se llama "correo", no "email"
+        $query = "SELECT * FROM " . $this->table_name . " WHERE correo = :email LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $email);
         $stmt->execute();
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Validación
-        if ($user && password_verify($password, $user['password'])) {
+        // Validación de contraseña contra la columna "contrasena_hash"
+        if ($user && password_verify($password, $user['contrasena_hash'])) {
             return $user;
         }
         return false;
     }
+
 }
