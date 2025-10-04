@@ -351,3 +351,169 @@
     color: white;
     border: none;
 }
+
+/* Media Queries para diseño responsive */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 992px) {
+    .accounts-sections {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .accounts-title {
+        font-size: 2.5rem;
+    }
+    
+    .modal {
+        max-width: 90%;
+        max-height: 85vh;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .accounts-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stats-card {
+        padding: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .stats-label {
+        font-size: 0.9rem;
+    }
+    
+    .accounts-sections {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .section-header {
+        font-size: 1.2rem;
+    }
+    
+    .user-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .modal {
+        width: 95%;
+        max-width: none;
+        max-height: 90vh;
+        padding: 1rem;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        width: 100% !important;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-row span {
+        text-align: left;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .accounts-title {
+        font-size: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 1.75rem;
+    }
+    
+    .user-info h4 {
+        font-size: 0.9rem;
+    }
+    
+    .user-info p {
+        font-size: 0.75rem;
+    }
+    
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+    
+    .create-btn {
+        padding: 1.5rem;
+    }
+    
+    .create-btn i {
+        font-size: 1.5rem;
+    }
+}
+
+/* Ajustes adicionales para formularios */
+@media (max-width: 768px) {
+    .modal-form input,
+    .modal-form select,
+    .modal-form textarea {
+        font-size: 16px !important; /* Evita zoom automático en iOS */
+    }
+    
+    .form-submit-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+

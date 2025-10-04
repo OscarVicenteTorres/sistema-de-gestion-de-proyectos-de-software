@@ -188,23 +188,29 @@
             <form class="modal-form" id="create-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="nombres">Nombres</label>
-                        <input type="text" id="nombres" name="nombres" placeholder="Ingrese su nombres" required>
+                        <label for="nombres">Nombres *</label>
+                        <input type="text" id="nombres" name="nombres" placeholder="Ingrese su nombres" 
+                               required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                               title="Solo letras y espacios (2-50 caracteres)">
                     </div>
                     <div class="form-group">
-                        <label for="apellidos">Apellidos</label>
-                        <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese apellidos" required>
+                        <label for="apellidos">Apellidos *</label>
+                        <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese apellidos" 
+                               required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                               title="Solo letras y espacios (2-50 caracteres)">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="documento">Nro documento</label>
-                        <input type="text" id="documento" name="documento" placeholder="123..." required>
+                        <label for="documento">Nro documento *</label>
+                        <input type="text" id="documento" name="documento" placeholder="Ej: 12345678" 
+                               required minlength="8" maxlength="12" pattern="[0-9]+"
+                               title="Solo números (8-12 dígitos)">
                     </div>
                     <div class="form-group">
-                        <label for="tipo-documento">Tipo de documento</label>
+                        <label for="tipo-documento">Tipo de documento *</label>
                         <select id="tipo-documento" name="tipo_documento" required>
-                            <option value="">tipo de documento</option>
+                            <option value="">Seleccione tipo</option>
                             <option value="DNI">DNI</option>
                             <option value="CE">Carnet de Extranjería</option>
                             <option value="Pasaporte">Pasaporte</option>
@@ -213,19 +219,24 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="correo">Correo</label>
-                        <input type="email" id="correo" name="correo" placeholder="@" required>
+                        <label for="correo">Correo *</label>
+                        <input type="email" id="correo" name="correo" placeholder="usuario@ejemplo.com" 
+                               required maxlength="100"
+                               pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                               title="Ingrese un correo válido">
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="Ingrese su numero de Teléfono">
+                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321" 
+                               minlength="7" maxlength="15" pattern="[0-9+\s()-]+"
+                               title="Solo números y símbolos telefónicos">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="area-trabajo">Área de trabajo</label>
+                        <label for="area-trabajo">Área de trabajo *</label>
                         <select id="area-trabajo" name="area_trabajo" required>
-                            <option value="">Ingresar su área de trabajo</option>
+                            <option value="">Seleccione área</option>
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
                             <option value="Fullstack">Fullstack</option>
@@ -234,27 +245,34 @@
                     </div>
                     <div class="form-group">
                         <label for="fecha-inicio">Fecha de inicio</label>
-                        <input type="date" id="fecha-inicio" name="fecha_inicio" placeholder="Ingrese su numero de Teléfono">
+                        <input type="date" id="fecha-inicio" name="fecha_inicio" 
+                               max="<?= date('Y-m-d') ?>">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="contrasena">Contraseña</label>
-                        <input type="password" id="contrasena" name="contrasena" placeholder="Ingrese su Contraseña" required>
+                        <label for="contrasena">Contraseña *</label>
+                        <input type="password" id="contrasena" name="contrasena" placeholder="Mínimo 6 caracteres" 
+                               required minlength="6" maxlength="50"
+                               title="La contraseña debe tener al menos 6 caracteres">
                     </div>
                     <div class="form-group">
-                        <label for="confirmar-contrasena">Confirmar Contraseña</label>
-                        <input type="password" id="confirmar-contrasena" name="confirmar_contrasena" placeholder="Confirme su Contraseña" required>
+                        <label for="confirmar-contrasena">Confirmar Contraseña *</label>
+                        <input type="password" id="confirmar-contrasena" name="confirmar_contrasena" 
+                               placeholder="Repita la contraseña" required minlength="6" maxlength="50">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="tecnologias">Tecnologías (skills)</label>
-                    <input type="text" id="tecnologias" name="tecnologias" placeholder="React, Python, Java, Wordpress" required>
+                    <label for="tecnologias">Tecnologías (skills) *</label>
+                    <input type="text" id="tecnologias" name="tecnologias" 
+                           placeholder="React, Python, Java, WordPress" 
+                           required minlength="2" maxlength="200"
+                           title="Tecnologías separadas por comas">
                 </div>
                 <div class="form-group">
-                    <label for="rol">rol</label>
+                    <label for="rol">Rol *</label>
                     <select id="rol" name="rol" required>
-                        <option value="">elige si el usuario a crear es admin o desarrollador</option>
+                        <option value="">Seleccione un rol</option>
                         <option value="Administrador">Administrador</option>
                         <option value="Desarrollador">Desarrollador</option>
                     </select>
@@ -309,21 +327,27 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="edit-nombres">Nombres</label>
-                        <input type="text" id="edit-nombres" name="nombres" required>
+                        <label for="edit-nombres">Nombres *</label>
+                        <input type="text" id="edit-nombres" name="nombres" 
+                               required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                               title="Solo letras y espacios (2-50 caracteres)">
                     </div>
                     <div class="form-group">
-                        <label for="edit-apellidos">Apellidos</label>
-                        <input type="text" id="edit-apellidos" name="apellidos" required>
+                        <label for="edit-apellidos">Apellidos *</label>
+                        <input type="text" id="edit-apellidos" name="apellidos" 
+                               required minlength="2" maxlength="50" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                               title="Solo letras y espacios (2-50 caracteres)">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="edit-documento">Nro documento</label>
-                        <input type="text" id="edit-documento" name="documento" required>
+                        <label for="edit-documento">Nro documento *</label>
+                        <input type="text" id="edit-documento" name="documento" 
+                               required minlength="8" maxlength="12" pattern="[0-9]+"
+                               title="Solo números (8-12 dígitos)">
                     </div>
                     <div class="form-group">
-                        <label for="edit-tipo-documento">Tipo de documento</label>
+                        <label for="edit-tipo-documento">Tipo de documento *</label>
                         <select id="edit-tipo-documento" name="tipo_documento" required>
                             <option value="DNI">DNI</option>
                             <option value="CE">Carnet de Extranjería</option>
@@ -333,17 +357,22 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="edit-correo">Correo</label>
-                        <input type="email" id="edit-correo" name="correo" required>
+                        <label for="edit-correo">Correo *</label>
+                        <input type="email" id="edit-correo" name="correo" 
+                               required maxlength="100"
+                               pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                               title="Ingrese un correo válido">
                     </div>
                     <div class="form-group">
                         <label for="edit-telefono">Teléfono</label>
-                        <input type="tel" id="edit-telefono" name="telefono">
+                        <input type="tel" id="edit-telefono" name="telefono" 
+                               minlength="7" maxlength="15" pattern="[0-9+\s()-]+"
+                               title="Solo números y símbolos telefónicos">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="edit-area-trabajo">Área de trabajo</label>
+                        <label for="edit-area-trabajo">Área de trabajo *</label>
                         <select id="edit-area-trabajo" name="area_trabajo" required>
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
@@ -353,25 +382,32 @@
                     </div>
                     <div class="form-group">
                         <label for="edit-fecha-inicio">Fecha de inicio</label>
-                        <input type="date" id="edit-fecha-inicio" name="fecha_inicio">
+                        <input type="date" id="edit-fecha-inicio" name="fecha_inicio" 
+                               max="<?= date('Y-m-d') ?>">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="edit-contrasena">Nueva Contraseña (opcional)</label>
-                        <input type="password" id="edit-contrasena" name="contrasena" placeholder="Dejar en blanco para mantener actual">
+                        <input type="password" id="edit-contrasena" name="contrasena" 
+                               placeholder="Dejar en blanco para mantener actual" 
+                               minlength="6" maxlength="50"
+                               title="La contraseña debe tener al menos 6 caracteres">
                     </div>
                     <div class="form-group">
                         <label for="edit-confirmar-contrasena">Confirmar Nueva Contraseña</label>
-                        <input type="password" id="edit-confirmar-contrasena" name="confirmar_contrasena" placeholder="Confirmar nueva contraseña">
+                        <input type="password" id="edit-confirmar-contrasena" name="confirmar_contrasena" 
+                               placeholder="Confirmar nueva contraseña" minlength="6" maxlength="50">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="edit-tecnologias">Tecnologías (skills)</label>
-                    <input type="text" id="edit-tecnologias" name="tecnologias" required>
+                    <label for="edit-tecnologias">Tecnologías (skills) *</label>
+                    <input type="text" id="edit-tecnologias" name="tecnologias" 
+                           required minlength="2" maxlength="200"
+                           title="Tecnologías separadas por comas">
                 </div>
                 <div class="form-group">
-                    <label for="edit-rol">rol</label>
+                    <label for="edit-rol">Rol *</label>
                     <select id="edit-rol" name="rol" required>
                         <option value="Administrador">Administrador</option>
                         <option value="Desarrollador">Desarrollador</option>
