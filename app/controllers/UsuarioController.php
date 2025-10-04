@@ -263,6 +263,17 @@ class UsuarioController extends Controller {
         $this->render('desarrollador/dashboard');
     }
 
+    public function dashboardGestor() {
+        // Verificar que el usuario esté autenticado y sea Gestor
+        AuthMiddleware::verificarRol(['Gestor de Proyecto']);
+        
+        // Dashboard para gestor de proyecto
+        $proyectoModel = new Proyecto();
+        $proyectos = $proyectoModel->obtenerTodosConEncargados();
+        
+        // Pasar los datos a la vista
+        $this->render('admin/dashboard', ['proyectos' => $proyectos]);
+    }
 
     public function dashboard() {
         // Método principal del dashboard que redirige según el rol
