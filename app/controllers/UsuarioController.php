@@ -292,9 +292,6 @@ class UsuarioController extends Controller {
             case 'Desarrollador':
                 $this->dashboardDesarrollador();
                 break;
-            case 'Gestor de Proyecto':
-                $this->dashboardGestor();
-                break;
             default:
                 redirect('Auth', 'login');
         }
