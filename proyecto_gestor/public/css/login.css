@@ -1,0 +1,103 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fondo general */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #141a2d; /* Azul oscuro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Título principal */
+h1 {
+    color: #f1c40f; /* Amarillo dorado */
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Subtítulo */
+.subtitulo {
+    color: #ffffff;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* Caja del formulario */
+.login-box {
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 4px;
+    text-align: center;
+    width: 320px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Etiquetas */
+.login-box label {
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 5px;
+}
+
+/* Inputs */
+.login-box input[type="email"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.login-box input::placeholder {
+    color: #888;
+    font-size: 13px;
+}
+
+/* Botón */
+.login-box button {
+    width: 100%;
+    background-color: #f1c40f;
+    color: #000;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 2px;
+    transition: background 0.3s;
+}
+
+.login-box button:hover {
+    background-color: #d4ac0d;
+}
+
+/* Error */
+.error {
+    color: red;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+/* Footer */
+footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #ccc;
+    text-align: center;
+}
