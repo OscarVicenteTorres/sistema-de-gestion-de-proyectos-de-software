@@ -9,8 +9,7 @@ class AuthMiddleware {
      */
     public static function verificarSesion() {
         if (!isset($_SESSION['usuario'])) {
-            header("Location: /proyect-prub/proyecto_gestor/index.php?c=Auth&a=login");
-            exit;
+            redirect('Auth', 'login');
         }
     }
 
@@ -25,15 +24,14 @@ class AuthMiddleware {
         if (!in_array($rolUsuario, $rolesPermitidos)) {
             // Redirigir según el rol del usuario
             if ($rolUsuario === 'Admin') {
-                header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardAdmin");
+                redirect('Usuario', 'dashboardAdmin');
             } else if ($rolUsuario === 'Desarrollador') {
-                header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardDesarrollador");
+                redirect('Usuario', 'dashboardDesarrollador');
             } else if ($rolUsuario === 'Gestor de Proyecto') {
-                header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardGestor");
+                redirect('Usuario', 'dashboardGestor');
             } else {
-                header("Location: /proyect-prub/proyecto_gestor/index.php?c=Auth&a=login");
+                redirect('Auth', 'login');
             }
-            exit;
         }
     }
 

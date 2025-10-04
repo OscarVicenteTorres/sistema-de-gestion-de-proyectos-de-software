@@ -7,8 +7,6 @@
 <body>
     <h2>Bienvenido Desarrollador</h2>
     <nav>
-        <a href="?c=Proyecto&a=index">Mis Proyectos</a> |
         <a href="?c=Asistencia&a=index">Asistencia</a>
     </nav>
-</body>
 </html>

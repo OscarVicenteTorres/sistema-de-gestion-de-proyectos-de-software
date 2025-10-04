@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
     <!-- Enlace al CSS -->
-    <link rel="stylesheet" href="/proyect-prub/proyecto_gestor/public/css/login.css">
+    <link rel="stylesheet" href="<?php echo asset('css/login.css'); ?>">
 </head>
 <body>
     <h1>SOFTWARE DE GESTION DE PROYECTOS</h1>

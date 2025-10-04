@@ -6,8 +6,8 @@
     <title>Gestor de Cuentas - Grupo Vicente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="public/css/dashboard-admin.css">
-    <link rel="stylesheet" href="public/css/usuarios.css">
+    <link rel="stylesheet" href="<?php echo asset('css/dashboard-admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/usuarios.css'); ?>">
 </head>
 <body>
     <!-- Sidebar -->
@@ -240,6 +240,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="public/js/usuarios.js"></script>
+    <script src="<?php echo asset('js/usuarios.js'); ?>"></script>
 </body>
 </html>

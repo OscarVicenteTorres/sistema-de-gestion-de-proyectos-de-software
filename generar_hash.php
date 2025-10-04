@@ -1,7 +1,7 @@
 <?php
 /**
  * Script para generar hashes de contraseñas
- * Ejecutar en: http://localhost/proyect-prub/generar_hash.php
+ * Ejecutar en: http://localhost/sistema-de-gestion-de-proyectos-de-software/generar_hash.php
  */
 
 // Contraseña que queremos hashear

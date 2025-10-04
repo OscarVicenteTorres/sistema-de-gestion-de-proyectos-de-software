@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/proyect-prub/proyecto_gestor/public/css/dashboard-admin.css">
+    <link rel="stylesheet" href="<?php echo asset('css/dashboard-admin.css'); ?>">
     <style>
         /* Forzar estilos del modal por encima de Bootstrap */
         .modal-overlay {
@@ -542,6 +542,6 @@
     <!-- Bootstrap 5 Bundle JS (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JavaScript -->
-    <script src="/proyect-prub/proyecto_gestor/public/js/dashboard.js"></script>
+    <script src="<?php echo asset('js/dashboard.js'); ?>"></script>
 </body>
 </html>

@@ -18,14 +18,14 @@ class AuthController extends Controller
 
                 // Redirigir según el rol del usuario
                 if ($usuario['rol'] === 'Admin') {
-                    header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardAdmin");
+                    redirect('Usuario', 'dashboardAdmin');
                 } else if ($usuario['rol'] === 'Desarrollador') {
-                    header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardDesarrollador");
+                    redirect('Usuario', 'dashboardDesarrollador');
                 } else if ($usuario['rol'] === 'Gestor de Proyecto') {
-                    header("Location: /proyect-prub/proyecto_gestor/index.php?c=Usuario&a=dashboardGestor");
+                    redirect('Usuario', 'dashboardGestor');
                 } else {
                     // Rol no reconocido, redirigir a login
-                    header("Location: /proyect-prub/proyecto_gestor/index.php?c=Auth&a=login");
+                    redirect('Auth', 'login');
                 }
 
                 exit;
@@ -41,7 +41,6 @@ class AuthController extends Controller
     public function logout()
     {
         session_destroy();
-        header("Location: /proyect-prub/proyecto_gestor/index.php");
-        exit;
+        redirect('Auth', 'login');
     }
 }

@@ -274,4 +274,29 @@ class UsuarioController extends Controller {
         // Pasar los datos a la vista
         $this->render('admin/dashboard', ['proyectos' => $proyectos]);
     }
+
+    public function dashboard() {
+        // Método principal del dashboard que redirige según el rol
+        session_start();
+        
+        if (!isset($_SESSION['usuario'])) {
+            redirect('Auth', 'login');
+        }
+
+        $rol = $_SESSION['usuario']['rol'] ?? '';
+        
+        switch ($rol) {
+            case 'Admin':
+                $this->dashboardAdmin();
+                break;
+            case 'Desarrollador':
+                $this->dashboardDesarrollador();
+                break;
+            case 'Gestor de Proyecto':
+                $this->dashboardGestor();
+                break;
+            default:
+                redirect('Auth', 'login');
+        }
+    }
 }
