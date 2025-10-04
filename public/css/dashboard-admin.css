@@ -82,6 +82,8 @@ body {
 /* --- Barra Lateral --- */
 .sidebar {
     width: 260px;
+    height: auto;
+    max-height: 450px;
     background-color: var(--color-white);
     padding: 24px;
     display: flex;
@@ -109,10 +111,6 @@ body {
 .sidebar-header p {
     font-size: 14px;
     color: var(--color-text-secondary);
-}
-
-.sidebar-nav {
-    flex-grow: 1;
 }
 
 .sidebar-nav ul {
@@ -395,7 +393,8 @@ body {
     z-index: 9999 !important;
     width: 90% !important;
     max-width: 680px !important;
-    max-height: 90vh !important;
+    max-height: 60vh !important;
+    height: auto !important;
     overflow-y: auto !important;
     opacity: 0 !important;
     visibility: hidden !important;
