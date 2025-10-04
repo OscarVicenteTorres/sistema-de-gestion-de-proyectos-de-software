@@ -10,8 +10,16 @@ class UsuarioController extends Controller {
         // Verificar que solo admins puedan ver usuarios
         AuthMiddleware::verificarRol(['Admin']);
         
-        // Renderiza la vista usuarios.php
-        $this->render('admin/usuarios');
+        try {
+            $usuarioModel = new Usuario();
+            $usuarios = $usuarioModel->obtenerTodos();
+            
+            // Renderiza la vista usuarios.php con los datos
+            $this->render('admin/usuarios', ['usuarios' => $usuarios]);
+        } catch (Exception $e) {
+            // En caso de error, renderizar con array vacío
+            $this->render('admin/usuarios', ['usuarios' => []]);
+        }
     }
 
     public function listar() {
@@ -87,6 +95,7 @@ class UsuarioController extends Controller {
             $fecha_inicio = $_POST['fecha_inicio'] ?? '';
             $contrasena = $_POST['contrasena'] ?? '';
             $tecnologias = $_POST['tecnologias'] ?? '';
+            $rol = $_POST['rol'] ?? 'Desarrollador';
             
             if (empty($nombre) || empty($apellido) || empty($correo) || empty($contrasena)) {
                 echo json_encode([
@@ -94,6 +103,14 @@ class UsuarioController extends Controller {
                     'message' => 'Todos los campos obligatorios deben ser completados'
                 ]);
                 return;
+            }
+            
+            // Convertir nombre de rol a id_rol
+            $id_rol = 2; // Por defecto Desarrollador
+            if ($rol === 'Administrador' || $rol === 'Admin') {
+                $id_rol = 1;
+            } elseif ($rol === 'Desarrollador') {
+                $id_rol = 2;
             }
             
             // Crear usuario
@@ -109,7 +126,7 @@ class UsuarioController extends Controller {
                 'fecha_inicio' => $fecha_inicio,
                 'contrasena' => $contrasena,
                 'tecnologias' => $tecnologias,
-                'id_rol' => 2, // Desarrollador por defecto
+                'id_rol' => $id_rol,
                 'activo' => 1
             ]);
             
@@ -122,6 +139,86 @@ class UsuarioController extends Controller {
                 echo json_encode([
                     'success' => false,
                     'message' => 'Error al crear el usuario'
+                ]);
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function actualizar() {
+        AuthMiddleware::verificarRol(['Admin']);
+        header('Content-Type: application/json');
+        
+        try {
+            $id_usuario = $_POST['id_usuario'] ?? '';
+            $nombre = $_POST['nombres'] ?? '';
+            $apellido = $_POST['apellidos'] ?? '';
+            $documento = $_POST['documento'] ?? '';
+            $tipo_documento = $_POST['tipo_documento'] ?? '';
+            $correo = $_POST['correo'] ?? '';
+            $telefono = $_POST['telefono'] ?? '';
+            $area_trabajo = $_POST['area_trabajo'] ?? '';
+            $fecha_inicio = $_POST['fecha_inicio'] ?? '';
+            $contrasena = $_POST['contrasena'] ?? '';
+            $tecnologias = $_POST['tecnologias'] ?? '';
+            $rol = $_POST['rol'] ?? '';
+            
+            if (empty($id_usuario) || empty($nombre) || empty($apellido) || empty($correo)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Todos los campos obligatorios deben ser completados'
+                ]);
+                return;
+            }
+            
+            // Convertir nombre de rol a id_rol si se proporciona
+            $id_rol = null;
+            if (!empty($rol)) {
+                if ($rol === 'Administrador' || $rol === 'Admin') {
+                    $id_rol = 1;
+                } elseif ($rol === 'Desarrollador') {
+                    $id_rol = 2;
+                }
+            }
+            
+            $datos = [
+                'nombre' => $nombre,
+                'apellido' => $apellido,
+                'documento' => $documento,
+                'tipo_documento' => $tipo_documento,
+                'correo' => $correo,
+                'telefono' => $telefono,
+                'area_trabajo' => $area_trabajo,
+                'fecha_inicio' => $fecha_inicio,
+                'tecnologias' => $tecnologias
+            ];
+            
+            // Agregar id_rol si se proporcionó
+            if ($id_rol !== null) {
+                $datos['id_rol'] = $id_rol;
+            }
+            
+            // Solo actualizar contraseña si se proporciona
+            if (!empty($contrasena)) {
+                $datos['contrasena'] = $contrasena;
+            }
+            
+            $usuarioModel = new Usuario();
+            $resultado = $usuarioModel->actualizar($id_usuario, $datos);
+            
+            if ($resultado) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Usuario actualizado exitosamente'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error al actualizar el usuario'
                 ]);
             }
         } catch (Exception $e) {

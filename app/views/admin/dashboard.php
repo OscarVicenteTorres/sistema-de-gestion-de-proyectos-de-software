@@ -14,75 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo asset('css/dashboard-admin.css'); ?>">
-    <style>
-        /* Forzar estilos del modal por encima de Bootstrap */
-        .modal-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            z-index: 9998 !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            transition: opacity 0.3s ease, visibility 0.3s ease !important;
-            display: block !important;
-        }
-        
-        .modal-overlay.active {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
-        .modal {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) scale(0.8) !important;
-            background-color: #ffffff !important;
-            border-radius: 12px !important;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
-            z-index: 9999 !important;
-            width: 90% !important;
-            max-width: 680px !important;
-            max-height: 90vh !important;
-            overflow-y: auto !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            transition: all 0.3s ease !important;
-            display: block !important;
-        }
-        
-        .modal.active {
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: translate(-50%, -50%) scale(1) !important;
-        }
-        
-        /* Quitar resaltado azul de inputs */
-        .modal-form input:focus,
-        .modal-form textarea:focus,
-        .modal-form select:focus {
-            outline: none !important;
-            border-color: #d4a017 !important;
-            box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.15) !important;
-            background-color: #ffffff !important;
-        }
-        
-        /* Fondo de inputs */
-        .modal-form input,
-        .modal-form textarea,
-        .modal-form select {
-            background-color: #f8f9fa !important;
-            color: #2c2c2c !important;
-        }
-        
-        /* Color personalizado para texto púrpura */
-        .text-purple {
-            color: #8b5cf6 !important;
-        }
-    </style>
+   
 </head>
 <body>
     <div class="dashboard-container">

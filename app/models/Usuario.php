@@ -26,10 +26,15 @@ class Usuario {
     }
 
     public function obtenerTodos() {
-        $sql = "SELECT u.*, r.nombre as rol_nombre,
-                       u.id_usuario as id
+        $sql = "SELECT u.*, 
+                       r.nombre as rol_nombre,
+                       CASE 
+                           WHEN u.activo = 1 THEN 'Activo'
+                           ELSE 'Inactivo'
+                       END as estado,
+                       u.id_usuario
                 FROM usuarios u
-                JOIN roles r ON u.id_rol = r.id_rol
+                LEFT JOIN roles r ON u.id_rol = r.id_rol
                 ORDER BY u.activo DESC, u.nombre ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
@@ -37,10 +42,12 @@ class Usuario {
     }
 
     public function obtenerPorId($id) {
-        $sql = "SELECT u.*, r.nombre as rol_nombre,
+        $sql = "SELECT u.*, 
+                       r.nombre as rol_nombre,
+                       u.id_rol as id_rol,
                        u.contrasena as contrasena_hash
                 FROM usuarios u
-                JOIN roles r ON u.id_rol = r.id_rol
+                LEFT JOIN roles r ON u.id_rol = r.id_rol
                 WHERE u.id_usuario = :id
                 LIMIT 1";
         $stmt = $this->conn->prepare($sql);
@@ -82,6 +89,67 @@ class Usuario {
         $stmt->bindParam(':activo', $datos['activo']);
         
         return $stmt->execute();
+    }
+
+    public function actualizar($id, $datos) {
+        // Construir la consulta dinámicamente según los datos proporcionados
+        $campos = [];
+        $valores = [];
+        
+        if (isset($datos['nombre'])) {
+            $campos[] = "nombre = :nombre";
+            $valores[':nombre'] = $datos['nombre'];
+        }
+        if (isset($datos['apellido'])) {
+            $campos[] = "apellido = :apellido";
+            $valores[':apellido'] = $datos['apellido'];
+        }
+        if (isset($datos['documento'])) {
+            $campos[] = "documento = :documento";
+            $valores[':documento'] = $datos['documento'];
+        }
+        if (isset($datos['tipo_documento'])) {
+            $campos[] = "tipo_documento = :tipo_documento";
+            $valores[':tipo_documento'] = $datos['tipo_documento'];
+        }
+        if (isset($datos['correo'])) {
+            $campos[] = "correo = :correo";
+            $valores[':correo'] = $datos['correo'];
+        }
+        if (isset($datos['telefono'])) {
+            $campos[] = "telefono = :telefono";
+            $valores[':telefono'] = $datos['telefono'];
+        }
+        if (isset($datos['area_trabajo'])) {
+            $campos[] = "area_trabajo = :area_trabajo";
+            $valores[':area_trabajo'] = $datos['area_trabajo'];
+        }
+        if (isset($datos['fecha_inicio'])) {
+            $campos[] = "fecha_inicio = :fecha_inicio";
+            $valores[':fecha_inicio'] = $datos['fecha_inicio'];
+        }
+        if (isset($datos['tecnologias'])) {
+            $campos[] = "tecnologias = :tecnologias";
+            $valores[':tecnologias'] = $datos['tecnologias'];
+        }
+        if (isset($datos['id_rol'])) {
+            $campos[] = "id_rol = :id_rol";
+            $valores[':id_rol'] = $datos['id_rol'];
+        }
+        if (isset($datos['contrasena'])) {
+            $campos[] = "contrasena = :contrasena";
+            $valores[':contrasena'] = password_hash($datos['contrasena'], PASSWORD_DEFAULT);
+        }
+        
+        if (empty($campos)) {
+            return false;
+        }
+        
+        $sql = "UPDATE usuarios SET " . implode(", ", $campos) . " WHERE id_usuario = :id";
+        $valores[':id'] = $id;
+        
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute($valores);
     }
 
     public function actualizarEstado($id, $estado) {
