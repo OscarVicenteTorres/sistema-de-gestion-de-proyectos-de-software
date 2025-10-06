@@ -13,7 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo asset('css/dashboard-admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/menu.css'); ?>">
 </head>
 <body>
     <div class="dashboard-container">

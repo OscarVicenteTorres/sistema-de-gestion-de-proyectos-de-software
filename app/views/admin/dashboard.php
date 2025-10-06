@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,9 +14,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="<?php echo asset('css/dashboard-admin.css'); ?>">
-   
+    <link rel="stylesheet" href="<?php echo asset('css/admin/base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/menu.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/dashboard-admin.css'); ?>">
+
+
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Barra Lateral de Navegación -->
@@ -51,7 +56,7 @@
                     <button class="btn btn-warning text-dark fw-bold shadow-sm" id="add-project-btn">
                         <i class="fa-solid fa-plus me-2"></i>Nuevo Proyecto
                     </button>
-                    
+
                     <select id="filter-category" class="form-select form-select-sm shadow-sm" style="width: auto; min-width: 200px;">
                         <option value="">📁 Categoría</option>
                         <option value="Software de gestión">Software de gestión (ERP, inventario, CRM, facturación)</option>
@@ -60,7 +65,7 @@
                         <option value="Portal corporativo">Portal corporativo / institucional</option>
                         <option value="Plataforma SaaS">Plataforma SaaS / interactiva</option>
                     </select>
-                    
+
                     <select id="filter-progress" class="form-select form-select-sm shadow-sm" style="width: auto; min-width: 180px;">
                         <option value="">📊 Progreso</option>
                         <option value="Pendiente">Pendiente</option>
@@ -70,7 +75,7 @@
                         <option value="Implementación">Implementación</option>
                         <option value="Completado">Completado</option>
                     </select>
-                    
+
                     <button class="btn btn-outline-dark btn-sm shadow-sm" id="report-btn">
                         <i class="fa-solid fa-chart-line me-2"></i>Reporte Rápido
                     </button>
@@ -111,18 +116,18 @@
                                         <td class="text-muted small"><?= $proyecto['encargados'] ?? '<span class="text-secondary">Sin asignar</span>' ?></td>
                                         <td style="min-width: 150px;">
                                             <div class="progress" style="height: 20px;">
-                                                <div class="progress-bar bg-warning" role="progressbar" 
-                                                     style="width: <?= $proyecto['porcentaje_avance'] ?>%;" 
-                                                     aria-valuenow="<?= $proyecto['porcentaje_avance'] ?>" 
-                                                     aria-valuemin="0" 
-                                                     aria-valuemax="100">
+                                                <div class="progress-bar bg-warning" role="progressbar"
+                                                    style="width: <?= $proyecto['porcentaje_avance'] ?>%;"
+                                                    aria-valuenow="<?= $proyecto['porcentaje_avance'] ?>"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100">
                                                     <span class="text-dark fw-semibold"><?= $proyecto['porcentaje_avance'] ?>%</span>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <?php
-                                            $estadoColor = match($proyecto['estado']) {
+                                            $estadoColor = match ($proyecto['estado']) {
                                                 'Completado' => 'text-success',
                                                 'En Desarrollo' => 'text-primary',
                                                 'Implementación' => 'text-info',
@@ -254,7 +259,7 @@
                         <span class="view-value" id="view-status">-</span>
                     </div>
                 </div>
-                
+
                 <!-- Fechas y progreso -->
                 <div class="view-section">
                     <div class="view-field">
@@ -275,12 +280,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="view-description">
                 <h3>Descripción</h3>
                 <p id="view-description">-</p>
             </div>
-            
+
             <div class="project-section">
                 <h3>Progreso del Proyecto</h3>
                 <div class="progress-bar-container">
@@ -288,7 +293,7 @@
                     <span id="view-progress-text">0%</span>
                 </div>
             </div>
-            
+
             <div class="team-section">
                 <h3>Equipo Asignado</h3>
                 <div id="team-members-list" class="team-members">
@@ -420,7 +425,7 @@
         </div>
         <div class="modal-body">
             <p class="summary-subtitle">Estadísticas rápidas</p>
-            
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>Proyectos Totales</h3>
@@ -439,19 +444,19 @@
                     <p class="stat-number" id="stat-infraestructura">0</p>
                 </div>
             </div>
-            
+
             <div class="alert-section">
                 <h3 class="alert-title">Alerta</h3>
                 <p class="alert-subtitle">Proyectos Vencidos</p>
-                
+
                 <div class="alert-list" id="report-alerts-list">
-                    <?php 
-                    $proyectosVencidos = array_filter($proyectos ?? [], function($p) {
-                        return $p['estado'] === 'Vencido' || 
-                               ($p['fecha_fin'] && strtotime($p['fecha_fin']) < time());
+                    <?php
+                    $proyectosVencidos = array_filter($proyectos ?? [], function ($p) {
+                        return $p['estado'] === 'Vencido' ||
+                            ($p['fecha_fin'] && strtotime($p['fecha_fin']) < time());
                     });
                     ?>
-                    
+
                     <?php if (!empty($proyectosVencidos)): ?>
                         <?php foreach ($proyectosVencidos as $vencido): ?>
                             <div class="alert-item">
@@ -476,4 +481,5 @@
     <!-- Custom JavaScript -->
     <script src="<?php echo asset('js/dashboard.js'); ?>"></script>
 </body>
+
 </html>
