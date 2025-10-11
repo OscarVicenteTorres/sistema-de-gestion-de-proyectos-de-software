@@ -430,6 +430,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statInfra) statInfra.textContent = landingPage;
     }
 
-    // --- Toggle Sidebar de Resumen (Removido) ---
-    // Ya no se usa el panel lateral fijo
 });

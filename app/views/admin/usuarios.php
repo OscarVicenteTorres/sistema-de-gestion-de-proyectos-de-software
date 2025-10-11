@@ -55,8 +55,7 @@
             <div class="stats-grid">
                 <div class="create-btn" onclick="openCreateModal()">
                     <i class="fa-solid fa-plus"></i>
-                    <div>Crear Nueva</div>
-                    <div>Cuenta</div>
+                    <div class="create-text">Crear Nueva<br>Cuenta</div>
                 </div>
                 
                 <div class="stats-card">

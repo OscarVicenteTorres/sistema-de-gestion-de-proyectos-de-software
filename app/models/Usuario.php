@@ -160,6 +160,15 @@ class Usuario {
         return $stmt->execute();
     }
 
+    public function contarTareasAsignadas($id) {
+        $sql = "SELECT COUNT(*) as total FROM tareas WHERE id_usuario = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)($result['total'] ?? 0);
+    }
+
     public function eliminar($id) {
         $sql = "DELETE FROM usuarios WHERE id_usuario = :id";
         $stmt = $this->conn->prepare($sql);

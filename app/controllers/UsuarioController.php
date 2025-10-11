@@ -405,6 +405,19 @@ class UsuarioController extends Controller {
         
         try {
             $usuarioModel = new Usuario();
+            
+            // Primero verificar si el usuario tiene tareas asignadas
+            $totalTareas = $usuarioModel->contarTareasAsignadas($id);
+            
+            if ($totalTareas > 0) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => "No se puede eliminar el usuario porque tiene {$totalTareas} tarea(s) asignada(s). Por favor, reasigne o elimine las tareas primero, o marque el usuario como inactivo en su lugar."
+                ]);
+                return;
+            }
+            
+            // Si no tiene tareas, proceder con la eliminación
             $resultado = $usuarioModel->eliminar($id);
             
             if ($resultado) {
@@ -416,6 +429,19 @@ class UsuarioController extends Controller {
                 echo json_encode([
                     'success' => false,
                     'message' => 'Error al eliminar el usuario'
+                ]);
+            }
+        } catch (PDOException $e) {
+            // Capturar específicamente errores de restricción de clave foránea
+            if ($e->getCode() == '23000') {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'No se puede eliminar este usuario porque tiene registros relacionados (tareas, proyectos, etc.). Considere marcarlo como inactivo en su lugar.'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
                 ]);
             }
         } catch (Exception $e) {
