@@ -21,8 +21,6 @@ class AuthController extends Controller
                     redirect('Usuario', 'dashboardAdmin');
                 } else if ($usuario['rol'] === 'Desarrollador') {
                     redirect('Usuario', 'dashboardDesarrollador');
-                } else if ($usuario['rol'] === 'Gestor de Proyecto') {
-                    redirect('Usuario', 'dashboardGestor');
                 } else {
                     // Rol no reconocido, redirigir a login
                     redirect('Auth', 'login');
