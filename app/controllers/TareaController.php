@@ -4,11 +4,8 @@ require_once __DIR__ . "/../models/JustificacionTarea.php";
 require_once __DIR__ . '/../models/Usuario.php';
 require_once __DIR__ . '/../../core/BaseApiController.php';
 
-/*
-CONTROLADOR TAREA OPTIMIZADO - BACKEND PARA ADMINISTRADOR  
-Refactorizado con POO, elimina duplicación de código y mejora mantenibilidad.
-Usa BaseApiController para funcionalidad común.
- */
+//CONTROLADOR TAREA OPTIMIZADO - BACKEND PARA ADMINISTRADOR 
+//Refactorizado con POO, elimina duplicación de código y mejora mantenibilidad.
 class TareaController extends BaseApiController {
     private Tarea $tareaModel;
     private JustificacionTarea $justificacionModel;
