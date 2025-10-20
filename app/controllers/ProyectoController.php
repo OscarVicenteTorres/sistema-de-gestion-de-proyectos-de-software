@@ -4,6 +4,17 @@ require_once __DIR__ . '/../models/Proyecto.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
 class ProyectoController extends Controller {
+    /**
+     * Listar todos los proyectos en formato JSON (para AJAX)
+     */
+    public function listarAjax() {
+        AuthMiddleware::verificarSesion();
+        $proyectoModel = new Proyecto();
+        $proyectos = $proyectoModel->obtenerTodosConEncargados();
+        header('Content-Type: application/json');
+        echo json_encode($proyectos);
+        exit;
+    }
     
     /**
      * Ver todos los proyectos (lista)
