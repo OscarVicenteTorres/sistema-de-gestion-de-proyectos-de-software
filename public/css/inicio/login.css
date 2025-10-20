@@ -1,103 +1,242 @@
-/* Reset básico */
+/* 🔧 Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Fondo general */
+/* 🌌 Fondo con gradiente animado y rejilla sutil */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #141a2d; /* Azul oscuro */
+  background: #000028;
+  min-height: 100vh;           /* ✅ Fijo en altura completa del viewport */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  color: #fff;
+  position: relative;
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;           /* ✅ Evita movimiento al recargar */
+  position: relative;
+  z-index: 1;
+}
+
+/* Gradiente animado de fondo */
+.gradient-layer {
+  position: fixed;             /* ✅ Antes era absolute, cámbialo a fixed */
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(135deg, #000039, #000010, #000036, #00001f);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  z-index: -2;
+}
+
+/* Rejilla técnica */
+.grid-overlay {
+  position: fixed;             /* ✅ Fijo al viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -1;
+  opacity: 0.3;
+  animation: gridPulse 12s infinite ease-in-out;
+}
+@keyframes gridPulse {
+  0%,100% { opacity: 0.2; }
+  50% { opacity: 0.35; }
+}
+
+/* 🧱 Sección principal */
+
+/* 💎 Tarjeta de login estilo vidrio */
+.login-card {
+  background: rgba(0, 0, 30, 0.55);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(31, 144, 183,0.25);
+  border-radius: 20px;
+  padding: 50px 40px;
+  width: 360px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 20px rgba(31, 144, 183,0.15);
+  animation: aparecer 1.2s ease forwards;
+}
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 🪄 Logo y encabezado */
+.logo-area {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.logo-area h1 {
+  font-size: 16px;
+  color: #f1c40f;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(241,196,15,0.5);
+}
+.logo-area p {
+  font-size: 13px;
+  color: #ccc;
+  opacity: 0.9;
+}
+
+/* 🧾 Campos */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+.form-group label {
+  color: #f1c40f;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(241,196,15,0.25);
+  background: rgba(0, 0, 60, 0.6);
+  color: #fff;
+  font-size: 14px;
+  transition: 0.3s;
+  box-shadow: inset 0 0 10px rgba(0,0,70,0.4);
+}
+.form-group input:focus {
+  outline: none;
+  border-color: #f1c40f;
+  box-shadow: 0 0 15px rgba(241,196,15,0.5), inset 0 0 6px rgba(241,196,15,0.2);
+}
+
+/* 🔘 Botón */
+.btn-login {
+  width: 100%;
+  background: linear-gradient(90deg, #f1c40f, #d4ac0d);
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  color: #000;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.4s ease;
+  box-shadow: 0 0 15px rgba(241,196,15,0.6);
+}
+.btn-login:hover {
+  background: linear-gradient(90deg, #d4ac0d, #f1c40f);
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(241,196,15,0.9);
+}
+
+/* ⚠️ Error */
+.error {
+  color: #ff4b4b;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 13px;
+  text-shadow: 0 0 10px rgba(255,0,0,0.6);
+}
+
+/* ⚓ Footer */
+footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 11.5px;
+  color: #ccc;
+  opacity: 0.8;
+}
+
+/* 🟡 Logo GRUVITEC con efecto neón */
+.logo-neon {
+  width: 90px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(31, 144, 183,0.7))
+          drop-shadow(0 0 25px rgba(31, 144, 183,0.4))
+          brightness(1.2);
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+/* ✨ Animación del brillo */
+@keyframes glowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(31, 144, 183,0.7))
+            drop-shadow(0 0 25px rgba(31, 144, 183,0.4))
+            brightness(1.2);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(31, 144, 183,1))
+            drop-shadow(0 0 40px rgba(31, 144, 183,0.8))
+            brightness(1.4);
+    transform: scale(1.05);
+  }
+}
+
+
+
+/* === Transición de Login a Dashboard === */
+.transition-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #000000 40%, #020204 100%);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s;
+    z-index: 9999;
 }
 
-/* Título principal */
-h1 {
-    color: #f1c40f; /* Amarillo dorado */
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 10px;
+.transition-screen.active {
+    opacity: 1;
+    visibility: visible;
 }
 
-/* Subtítulo */
-.subtitulo {
-    color: #ffffff;
-    font-size: 14px;
-    text-align: center;
-    margin-bottom: 25px;
+.transition-logo {
+    width: 160px;
+    filter: drop-shadow(0 0 15px #00b3ff);
+    animation: pulse-glow 1.8s infinite alternate;
 }
 
-/* Caja del formulario */
-.login-box {
-    background: #fff;
-    padding: 30px 25px;
-    border-radius: 4px;
-    text-align: center;
-    width: 320px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+@keyframes pulse-glow {
+    from {
+        transform: scale(1);
+        filter: drop-shadow(0 0 10px #00b3ff);
+    }
+    to {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 25px #00f0ff);
+    }
 }
 
-/* Etiquetas */
-.login-box label {
-    display: block;
-    text-align: left;
-    font-weight: bold;
-    color: #000;
-    margin-bottom: 5px;
+/* Animación para desaparecer el login */
+.login-section.fade-out {
+    opacity: 0;
+    transform: scale(0.98);
+    filter: blur(3px);
+    transition: all 0.8s ease;
 }
 
-/* Inputs */
-.login-box input[type="email"],
-.login-box input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #000;
-    border-radius: 2px;
-    font-size: 14px;
-}
-
-.login-box input::placeholder {
-    color: #888;
-    font-size: 13px;
-}
-
-/* Botón */
-.login-box button {
-    width: 100%;
-    background-color: #f1c40f;
-    color: #000;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 2px;
-    transition: background 0.3s;
-}
-
-.login-box button:hover {
-    background-color: #d4ac0d;
-}
-
-/* Error */
-.error {
-    color: red;
-    margin-top: 10px;
-    font-size: 13px;
-}
-
-/* Footer */
-footer {
-    margin-top: 20px;
-    font-size: 12px;
-    color: #ccc;
-    text-align: center;
-}

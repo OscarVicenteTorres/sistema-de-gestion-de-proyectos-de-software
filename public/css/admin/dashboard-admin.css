@@ -829,3 +829,18 @@
 .team-member-progress .progress-bar-container span {
     font-size: 11px;
 }
+
+
+/* Efecto de aparición del dashboard */
+body {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInDashboard 0.8s ease-out forwards;
+}
+
+@keyframes fadeInDashboard {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
