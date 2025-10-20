@@ -1,21 +1,20 @@
 <?php
-/**
- * Middleware para proteger rutas que requieren autenticación
- */
+
+ //Middleware para proteger rutas que requieren autenticación
+
 class AuthMiddleware {
     
-    /**
-     * Verificar si el usuario está autenticado
-     */
+    //Verificar si el usuario está autenticado
+
     public static function verificarSesion() {
         if (!isset($_SESSION['usuario'])) {
             redirect('Auth', 'login');
         }
     }
 
-    /**
-     * Verificar si el usuario tiene un rol específico
-     */
+  
+    // Verificar si el usuario tiene un rol específico
+   
     public static function verificarRol($rolesPermitidos = []) {
         self::verificarSesion();
         
@@ -27,17 +26,15 @@ class AuthMiddleware {
                 redirect('Usuario', 'dashboardAdmin');
             } else if ($rolUsuario === 'Desarrollador') {
                 redirect('Usuario', 'dashboardDesarrollador');
-            } else if ($rolUsuario === 'Gestor de Proyecto') {
-                redirect('Usuario', 'dashboardGestor');
             } else {
                 redirect('Auth', 'login');
             }
         }
     }
 
-    /**
-     * Obtener el usuario actual de la sesión
-     */
+   
+   //Obtener el usuario actual de la sesión
+ 
     public static function getUsuarioActual() {
         return $_SESSION['usuario'] ?? null;
     }
