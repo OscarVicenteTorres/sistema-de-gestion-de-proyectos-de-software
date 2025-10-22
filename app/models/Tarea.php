@@ -19,12 +19,9 @@ class Tarea {
         $this->conn = Database::connect();
     }
 
-    /**
-     * Obtiene todas las tareas para el dashboard del administrador
-     * 
-     * @param array $filtros - Filtros opcionales: ['proyecto_id', 'area', 'estado', 'usuario_id']
-     * @return array - Lista de tareas con información completa
-     */
+  
+// Obtiene todas las tareas para el dashboard del administrador en la pagina de gestión de tareas
+     
     public function obtenerTodas($filtros = []) {
         $sql = "SELECT 
                     t.id_tarea,
@@ -40,6 +37,7 @@ class Tarea {
                     -- Información del proyecto
                     p.nombre as proyecto_nombre,
                     p.area as proyecto_area,
+                    p.porcentaje_avance as proyecto_progreso,
                     
                     -- Información del usuario asignado
                     u.nombre as usuario_nombre,

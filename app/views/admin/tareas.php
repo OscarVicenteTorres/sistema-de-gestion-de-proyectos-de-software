@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="<?php echo asset('css/admin/menu.css'); ?>">
     <link rel="stylesheet" href="<?php echo asset('css/admin/dashboard-admin.css'); ?>">
     <style>
+        
         .vista-inicial { display: block; }
         .vista-tareas { display: none; }
         .proyecto-seleccionado {
@@ -127,8 +128,6 @@
                                     <th>Proyecto</th>
                                     <th>Categoría</th>
                                     <th>Progreso</th>
-                                    <th>Estado</th>
-                                    <th>Tareas</th>
                                 </tr>
                             </thead>
                             <tbody id="proyectosTableBody">
@@ -227,6 +226,9 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th style="width: 50px;"></th>
+                                    <th>Proyecto</th>
+                                    <th>Categoría</th>
+                                    <th>Progreso (Proyecto)</th>
                                     <th>Tarea</th>
                                     <th>Asignado</th>
                                     <th>Área</th>
@@ -237,7 +239,7 @@
                             </thead>
                             <tbody id="tareasTableBody">
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
+                                    <td colspan="10" class="text-center py-4">
                                         <div class="spinner-border text-warning" role="status">
                                             <span class="visually-hidden">Cargando...</span>
                                         </div>

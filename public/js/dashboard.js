@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const teamMembers = [
                         { nombre: 'Juan Pérez', rol: 'Frontend Developer', progreso: 75 },
                         { nombre: 'María García', rol: 'Backend Developer', progreso: 60 },
-                        { nombre: 'Carlos López', rol: 'UI/UX Designer', progreso: 90 }
+                        { nombre: 'Carlos López', rol: 'Frontend', progreso: 90 }
                     ];
                     
                     teamMembers.forEach(member => {
