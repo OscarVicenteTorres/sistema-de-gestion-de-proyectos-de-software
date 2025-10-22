@@ -15,6 +15,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo asset('css/admin/base.css'); ?>">
     <link rel="stylesheet" href="<?php echo asset('css/admin/menu.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/Exportar.css'); ?>">
 </head>
 <body>
     <div class="dashboard-container">
@@ -44,9 +45,80 @@
             </div>
         </aside>
 
-    <!-- Bootstrap 5 Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="<?php echo asset('js/dashboard.js'); ?>"></script>
+        <!-- Modal Exportar -->
+        <div class="exportar-container">
+
+            <h2>Resumen de Proyectos</h2>
+            <div class="stats">
+                <div class="card total">Totales: <span><?= $estadisticas['total'] ?? 0 ?></span></div>
+                <div class="card activos">Activos: <span><?= $estadisticas['activos'] ?? 0 ?></span></div>
+                <div class="card completados">Completados: <span><?= $estadisticas['completados'] ?? 0 ?></span></div>
+            </div>
+
+            <h3>Listado de Proyectos</h3>
+            <table class="tabla-proyectos">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Herramienta</th>
+                        <th>Avance</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($proyectos)): ?>
+                        <?php foreach ($proyectos as $index => $p): ?>
+                            <tr>
+                                <td><?= $index + 1 ?></td>
+                                <td><?= htmlspecialchars($p['nombre']) ?></td>
+                                <td><?= htmlspecialchars($p['categoria'] ?? 'N/A') ?></td>
+                                <td><?= htmlspecialchars($p['porcentaje_avance'] ?? 0) ?>%</td>
+                                <td><?= htmlspecialchars($p['estado']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5">No hay proyectos registrados.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <button id="btnExportar" class="btn-exportar">Exportar</button>
+
+            <!-- Popup Modal -->
+            <div id="modalExportar" class="modal">
+                <div class="modal-content">
+                    <span id="cerrarModal" class="cerrar">&times;</span>
+                    <h3>Seleccionar proyectos a exportar</h3>
+                    <form method="POST" action="exportar.php">
+                        <?php foreach ($proyectos as $p): ?>
+                            <label>
+                                <input type="checkbox" name="proyectos[]" value="<?= $p['id_proyecto'] ?>">
+                                <?= htmlspecialchars($p['nombre']) ?>
+                            </label><br>
+                        <?php endforeach; ?>
+
+                        <div class="formato">
+                            <label>Formato:</label>
+                            <select name="formato">
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-confirmar">Exportar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <script src="<?php echo asset('js/exportar.js'); ?>"></script>
 </body>
 </html>

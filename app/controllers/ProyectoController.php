@@ -19,24 +19,26 @@ class ProyectoController extends Controller {
     /**
      * Ver todos los proyectos (lista)
      */
-    public function index() {
+    public function index()
+    {
         AuthMiddleware::verificarSesion();
-        
+
         $proyectoModel = new Proyecto();
         $proyectos = $proyectoModel->obtenerTodosConEncargados();
-        
+
         $this->render('admin/dashboard', ['proyectos' => $proyectos]);
     }
 
     /**
      * Crear un nuevo proyecto
      */
-    public function crear() {
+    public function crear()
+    {
         AuthMiddleware::verificarRol(['Admin', 'Gestor de Proyecto']);
-        
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $proyectoModel = new Proyecto();
-            
+
             $datos = [
                 'nombre' => $_POST['nombre'] ?? '',
                 'descripcion' => $_POST['descripcion'] ?? '',
@@ -50,9 +52,9 @@ class ProyectoController extends Controller {
                 'tecnologias' => $_POST['tecnologias'] ?? null,
                 'id_usuario_creador' => $_SESSION['usuario']['id_usuario']
             ];
-            
+
             $resultado = $proyectoModel->crear($datos);
-            
+
             header('Content-Type: application/json');
             if ($resultado) {
                 echo json_encode(['success' => true, 'message' => 'Proyecto creado exitosamente']);
@@ -66,13 +68,14 @@ class ProyectoController extends Controller {
     /**
      * Actualizar un proyecto existente
      */
-    public function actualizar() {
+    public function actualizar()
+    {
         AuthMiddleware::verificarRol(['Admin', 'Gestor de Proyecto']);
-        
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $proyectoModel = new Proyecto();
             $id = $_GET['id'] ?? 0;
-            
+
             $datos = [
                 'nombre' => $_POST['nombre'] ?? '',
                 'descripcion' => $_POST['descripcion'] ?? '',
@@ -85,9 +88,9 @@ class ProyectoController extends Controller {
                 'recursos' => $_POST['recursos'] ?? null,
                 'tecnologias' => $_POST['tecnologias'] ?? null
             ];
-            
+
             $resultado = $proyectoModel->actualizar($id, $datos);
-            
+
             header('Content-Type: application/json');
             if ($resultado) {
                 echo json_encode(['success' => true, 'message' => 'Proyecto actualizado exitosamente']);
@@ -101,15 +104,16 @@ class ProyectoController extends Controller {
     /**
      * Eliminar un proyecto
      */
-    public function eliminar() {
+    public function eliminar()
+    {
         AuthMiddleware::verificarRol(['Admin']);
-        
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $proyectoModel = new Proyecto();
             $id = $_GET['id'] ?? 0;
-            
+
             $resultado = $proyectoModel->eliminar($id);
-            
+
             header('Content-Type: application/json');
             if ($resultado) {
                 echo json_encode(['success' => true, 'message' => 'Proyecto eliminado exitosamente']);
@@ -123,13 +127,14 @@ class ProyectoController extends Controller {
     /**
      * Obtener detalles de un proyecto
      */
-    public function obtenerDetalles() {
+    public function obtenerDetalles()
+    {
         AuthMiddleware::verificarSesion();
-        
+
         $id = $_GET['id'] ?? 0;
         $proyectoModel = new Proyecto();
         $proyecto = $proyectoModel->obtenerPorId($id);
-        
+
         header('Content-Type: application/json');
         if ($proyecto) {
             // Formatear fechas
@@ -139,7 +144,7 @@ class ProyectoController extends Controller {
             if ($proyecto['fecha_fin']) {
                 $proyecto['fecha_fin'] = date('Y-m-d', strtotime($proyecto['fecha_fin']));
             }
-            
+
             echo json_encode([
                 'success' => true,
                 'proyecto' => $proyecto
@@ -153,12 +158,27 @@ class ProyectoController extends Controller {
         exit;
     }
 
+
     /**
      * Exportar proyectos
      */
-    public function exportar() {
+    public function exportar()
+    {
         AuthMiddleware::verificarRol(['Admin', 'Gestor de Proyecto']);
-        
-        $this->render('admin/exportar');
+
+        $proyectoModel = new Proyecto();
+
+        // Obtener todos los proyectos completados
+        $proyectosCompletados = $proyectoModel->obtenerCompletados();
+
+        // Obtener estadísticas generales
+        $estadisticas = $proyectoModel->obtenerEstadisticas();
+
+        // Enviar ambos a la vista
+        $this->render('admin/exportar', [
+            'proyectos' => $proyectosCompletados,
+            'estadisticas' => $estadisticas
+        ]);
     }
+
 }

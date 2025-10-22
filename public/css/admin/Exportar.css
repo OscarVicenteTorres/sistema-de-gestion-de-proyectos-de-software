@@ -1,0 +1,148 @@
+
+/* ----- PANEL EXPORTAR (Gestor de Datos) ----- */
+.main-content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    padding: 16px 40px ;
+}
+
+
+.main-content.exportar {
+    background-color: #f8f9fa;
+}
+
+/* Tarjetas estadísticas */
+.stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 40px;
+    flex: 1;
+    margin: 10px;
+    transition: all 0.2s ease-in-out;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.stat-card p {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 5px;
+}
+.stat-card h2 {
+    font-weight: 700;
+    color: #09112d;
+}
+
+/* Título principal */
+.section-title {
+    font-weight: 700;
+    color: #e0b00b;
+}
+
+/* Proyectos */
+.project-card {
+    background: #fff;
+    border-left: 5px solid #09112d;
+}
+.project-card h5 {
+    color: #000;
+}
+.project-card .badge {
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+/* Barra de progreso */
+.progress {
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-bar {
+    background-color: #09112d !important;
+}
+
+/* Botón exportar */
+.btn-dark {
+    background-color: #09112d !important;
+    border: none;
+    border-radius: 8px;
+}
+.btn-dark:hover {
+    background-color: #e0b00b !important;
+    color: #000;
+}
+
+
+
+.exportar-container {
+    padding: 20px;
+}
+
+.stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.total { background-color: #007bff; }
+.activos { background-color: #28a745; }
+.completados { background-color: #ffc107; }
+
+.tabla-proyectos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-proyectos th, .tabla-proyectos td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.btn-exportar {
+    margin-top: 20px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.cerrar {
+    float: right;
+    cursor: pointer;
+    font-size: 20px;
+}
