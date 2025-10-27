@@ -1,4 +1,4 @@
-// ===== Usuarios Management System =====
+
 
 // Elementos del DOM
 const successModal = document.getElementById('success-modal');

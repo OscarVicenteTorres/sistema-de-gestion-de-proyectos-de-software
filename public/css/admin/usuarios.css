@@ -4,49 +4,6 @@
 }
 
 /* Modales reutilizados del dashboard */
-.modal-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background-color: rgba(0, 0, 0, 0.5) !important;
-    z-index: 9998 !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: opacity 0.3s ease, visibility 0.3s ease !important;
-    display: block !important;
-}
-
-.modal-overlay.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-.modal {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) scale(0.8) !important;
-    background-color: #ffffff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
-    z-index: 9999 !important;
-    width: 90% !important;
-    max-width: 680px !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: all 0.3s ease !important;
-    display: block !important;
-}
-
-.modal.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translate(-50%, -50%) scale(1) !important;
-}
 
 /* Modales pequeños (Alerta y Éxito) */
 .modal-small {

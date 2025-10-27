@@ -25,7 +25,7 @@ class Usuario {
         return false;
     }
 
-    public function obtenerTodos() {
+    public function obtenerTodos($filtros = []) { 
         $sql = "SELECT u.*, 
                        r.nombre as rol_nombre,
                        CASE 
@@ -34,10 +34,29 @@ class Usuario {
                        END as estado,
                        u.id_usuario
                 FROM usuarios u
-                LEFT JOIN roles r ON u.id_rol = r.id_rol
-                ORDER BY u.activo DESC, u.nombre ASC";
+                LEFT JOIN roles r ON u.id_rol = r.id_rol";
+        
+        $condiciones = [];
+        $parametros = [];
+
+        
+        if (!empty($filtros['area_trabajo'])) {
+            // Usar búsqueda LIKE case-insensitive para evitar problemas de mayúsculas/minúsculas
+            $condiciones[] = "LOWER(u.area_trabajo) LIKE :area_trabajo";
+            $parametros[':area_trabajo'] = '%' . strtolower($filtros['area_trabajo']) . '%';
+        }
+        
+        
+        $condiciones[] = "u.activo = 1";
+        
+        if (!empty($condiciones)) {
+            $sql .= " WHERE " . implode(" AND ", $condiciones);
+        }
+        
+        $sql .= " ORDER BY u.nombre ASC";
+        
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
+        $stmt->execute($parametros);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

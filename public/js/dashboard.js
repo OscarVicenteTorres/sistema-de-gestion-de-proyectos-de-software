@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Abrir el modal de "Crear Proyecto"
     if (addProjectBtn) {
         addProjectBtn.addEventListener('click', () => {
-            console.log('✅ Click detectado en Nuevo Proyecto');
+            console.log('Click detectado en Nuevo Proyecto');
             console.log('modalOverlay:', modalOverlay);
             console.log('createModal:', createModal);
             openModal(createModal);

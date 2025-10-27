@@ -92,6 +92,12 @@ class JustificacionTarea {
             $condiciones[] = "jt.id_tarea = :tarea_id";
             $parametros[':tarea_id'] = $filtros['tarea_id'];
         }
+
+        // Filtrar por proyecto si se envía proyecto_id (usa la relación tareas -> proyectos)
+        if (!empty($filtros['proyecto_id'])) {
+            $condiciones[] = "t.id_proyecto = :proyecto_id";
+            $parametros[':proyecto_id'] = $filtros['proyecto_id'];
+        }
         
         if (!empty($condiciones)) {
             $sql .= " WHERE " . implode(" AND ", $condiciones);
@@ -150,7 +156,19 @@ class JustificacionTarea {
      * @param string $comentarios - Comentarios adicionales del admin
      * @return array - ['exito' => bool, 'mensaje' => string]
      */
-    public function aprobar($id, $admin_id, $comentarios = '') {
+    /**
+     * Aprueba una justificación (solo administrador)
+     * Actualiza automáticamente la fecha límite de la tarea.
+     * Acepta una nueva fecha confirmada por el admin (opcional) que
+     * reemplazará la fecha sugerida por el desarrollador antes de aplicar.
+     *
+     * @param int $id
+     * @param int $admin_id
+     * @param string $comentarios
+     * @param string|null $nueva_fecha_confirmada - formato YYYY-MM-DD opcional
+     * @return array
+     */
+    public function aprobar($id, $admin_id, $comentarios = '', $nueva_fecha_confirmada = null) {
         // Verificar que la justificación existe y está pendiente
         $justificacion = $this->obtenerPorId($id);
         if (!$justificacion) {
@@ -165,29 +183,34 @@ class JustificacionTarea {
             // Iniciar transacción para garantizar consistencia
             $this->conn->beginTransaction();
             
-            // 1. Actualizar la justificación
+            // Determinar la fecha final que se aplicará (admin puede confirmar otra)
+            $fechaAplicar = $nueva_fecha_confirmada ?: $justificacion['nueva_fecha_limite'];
+
+            // 1. Actualizar la justificación (si el admin confirmó una fecha, guardarla)
             $sqlJust = "UPDATE justificaciones_tareas 
                        SET estado = 'Aprobada',
                            fecha_respuesta = CURRENT_TIMESTAMP,
                            respondido_por = :admin_id,
-                           comentarios_admin = :comentarios
+                           comentarios_admin = :comentarios,
+                           nueva_fecha_limite = :nueva_fecha
                        WHERE id_justificacion_tarea = :id";
-            
+
             $stmtJust = $this->conn->prepare($sqlJust);
             $stmtJust->execute([
                 ':admin_id' => $admin_id,
                 ':comentarios' => $comentarios,
+                ':nueva_fecha' => $fechaAplicar,
                 ':id' => $id
             ]);
-            
-            // 2. Actualizar la fecha límite de la tarea
+
+            // 2. Actualizar la fecha límite de la tarea con la fecha aplicada
             $sqlTarea = "UPDATE tareas 
                         SET fecha_limite = :nueva_fecha
                         WHERE id_tarea = :tarea_id";
-            
+
             $stmtTarea = $this->conn->prepare($sqlTarea);
             $stmtTarea->execute([
-                ':nueva_fecha' => $justificacion['nueva_fecha_limite'],
+                ':nueva_fecha' => $fechaAplicar,
                 ':tarea_id' => $justificacion['id_tarea']
             ]);
             
