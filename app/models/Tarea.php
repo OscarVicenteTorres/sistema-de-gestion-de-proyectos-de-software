@@ -21,10 +21,11 @@ class Tarea
         $this->conn = Database::connect();
     }
 
-  
-// Obtiene todas las tareas para el dashboard del administrador en la pagina de gestión de tareas
-     
-    public function obtenerTodas($filtros = []) {
+
+    // Obtiene todas las tareas para el dashboard del administrador en la pagina de gestión de tareas
+
+    public function obtenerTodas($filtros = [])
+    {
         $sql = "SELECT 
                     t.id_tarea,
                     t.titulo,
@@ -429,4 +430,28 @@ class Tarea
         ];
     }
 
+    public function obtenerTareasPorProyecto($id_proyecto)
+    {
+        $sql = "SELECT 
+                t.id_tarea,
+                t.titulo,
+                t.descripcion,
+                t.estado,
+                t.porcentaje_avance,
+                t.fecha_inicio,
+                t.fecha_limite,
+                t.area_asignada,
+                u.nombre AS usuario_nombre,
+                u.apellido AS usuario_apellido
+            FROM tareas t
+            INNER JOIN usuarios u ON t.id_usuario = u.id_usuario
+            WHERE t.id_proyecto = :id_proyecto
+            ORDER BY t.fecha_limite ASC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id_proyecto', $id_proyecto, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

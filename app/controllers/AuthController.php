@@ -14,13 +14,18 @@ class AuthController extends Controller
             $usuario = $usuarioModel->login($correo, $contrasena);
 
             if ($usuario) {
-                $_SESSION['usuario'] = $usuario;
+                $_SESSION['usuario'] = [
+                    'id_usuario' => $usuario['id_usuario'],
+                    'nombre' => $usuario['nombre'],
+                    'correo' => $usuario['correo'],
+                    'rol' => $usuario['rol']
+                ];
 
                 // Redirigir según el rol del usuario
                 if ($usuario['rol'] === 'Admin') {
                     redirect('Usuario', 'dashboardAdmin');
                 } else if ($usuario['rol'] === 'Desarrollador') {
-                    redirect('Usuario', 'dashboardDesarrollador');
+                    redirect('Asistencia', 'index');
                 } else {
                     // Rol no reconocido, redirigir a login
                     redirect('Auth', 'login');

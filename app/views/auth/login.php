@@ -17,7 +17,7 @@
         <section class="login-section">
             <div class="login-card">
                 <div class="logo-area">
-                    <img src="<?php echo asset('img/logoecd6bb9674-e1726685420875.png'); ?>" alt="GRUVITEC" class="logo-neon">
+                    <img src="<?php echo asset('img/logoemp.png'); ?>" alt="GRUVITEC" class="logo-neon">
                     <h1>SOFTWARE DE GESTIÓN DE PROYECTOS</h1>
                     <p>Grupo Vicente Inversiones E.I.R.L.</p>
                 </div>
@@ -47,7 +47,7 @@
     </div>
 
     <div id="transition-screen" class="transition-screen">
-        <img src="public/img/logoecd6bb9674-e1726685420875.png" alt="GRUVITEC" class="transition-logo">
+        <img src="<?php echo asset('img/logoemp.png'); ?>" alt="GRUVITEC" class="logo-neon">
     </div>
 
     <script>

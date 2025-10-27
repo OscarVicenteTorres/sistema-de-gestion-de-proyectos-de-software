@@ -246,4 +246,28 @@ class Proyecto
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function obtenerProyectosPorUsuario($id_usuario)
+    {
+        $sql = "SELECT 
+                p.id_proyecto,
+                p.nombre,
+                p.descripcion,
+                p.fecha_inicio,
+                p.fecha_fin,
+                p.estado,
+                p.area AS categoria,
+                p.porcentaje_avance
+            FROM proyectos p
+            INNER JOIN tareas t ON p.id_proyecto = t.id_proyecto
+            WHERE t.id_usuario = :id_usuario
+            GROUP BY p.id_proyecto
+            ORDER BY p.fecha_inicio DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

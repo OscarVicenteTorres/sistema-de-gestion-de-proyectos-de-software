@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('America/Lima');
 class Database {
     private static $host = "localhost";
     private static $db_name = "prueba_proyectos";
