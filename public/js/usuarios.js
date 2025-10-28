@@ -1,279 +1,258 @@
+// JS unificado para la gestión de usuarios
+// Maneja modales y peticiones AJAX utilizando la estructura JSON normalizada (exito/mensaje/datos)
+(function(){
+    'use strict';
 
-
-// Elementos del DOM
-const successModal = document.getElementById('success-modal');
-const successModalOverlay = document.getElementById('success-modal-overlay');
-const errorModal = document.getElementById('error-modal');
-const errorModalOverlay = document.getElementById('error-modal-overlay');
-const createModal = document.getElementById('modal-create');
-const createModalOverlay = document.getElementById('modal-create-overlay');
-const viewModal = document.getElementById('modal-view');
-const viewModalOverlay = document.getElementById('modal-view-overlay');
-const confirmModal = document.getElementById('modal-confirm');
-const confirmModalOverlay = document.getElementById('modal-confirm-overlay');
-
-// Variables globales
-let currentUserId = null;
-let currentAction = null;
-
-// ===== Funciones de Modal =====
-function openModal(modalElement, overlayElement) {
-    if (modalElement && overlayElement) {
-        overlayElement.classList.add('active');
-        modalElement.classList.add('active');
+    // Helper: normaliza la respuesta del servidor para aceptar ambas formas
+    function normalizeResponse(raw) {
+        const exito = (raw && (raw.exito !== undefined ? raw.exito : raw.success !== undefined ? raw.success : false));
+        const mensaje = raw && (raw.mensaje || raw.message || '') ;
+        const datos = raw && (raw.datos || raw.data || null);
+        const usuario = raw && (raw.usuario || (datos && datos.usuario) || null);
+        const usuarios = raw && (raw.usuarios || (Array.isArray(datos) ? datos : (datos && datos.usuarios) || null));
+        return { raw, exito, mensaje, datos, usuario, usuarios };
     }
-}
 
-function closeModal(modalElement, overlayElement) {
-    if (modalElement && overlayElement) {
-        overlayElement.classList.remove('active');
-        modalElement.classList.remove('active');
+    // Selector de elementos (guard-safe)
+    const $ = id => document.getElementById(id);
+
+    // Modales (basados en la vista)
+    const modalOverlay = $('modal-overlay');
+    function openModal(id){
+        if (!modalOverlay) return;
+        modalOverlay.classList.add('active');
+        const m = $(id);
+        if (m) m.classList.add('active');
     }
-}
+    function closeModal(){
+        if (!modalOverlay) return;
+        modalOverlay.classList.remove('active');
+        document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active'));
+    }
 
-function closeAllModals() {
-    const modals = document.querySelectorAll('.modal-overlay');
-    modals.forEach(modal => {
-        modal.classList.remove('active');
-    });
-    const modalContents = document.querySelectorAll('.modal');
-    modalContents.forEach(modal => {
-        modal.classList.remove('active');
-    });
-}
+    // Exponer función para abrir modal de creación (asegura compatibilidad con onclick en la vista)
+    window.openCreateModal = function(){ openModal('create-modal'); };
 
-// Cerrar modal al hacer clic en el overlay
-[successModalOverlay, errorModalOverlay, createModalOverlay, viewModalOverlay, confirmModalOverlay].forEach(overlay => {
-    if (overlay) {
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                closeAllModals();
+    function showSuccess(title, message){
+        const t = $('success-title');
+        const m = $('success-message');
+        if (t) t.textContent = title;
+        if (m) m.textContent = message;
+        openModal('success-modal');
+        setTimeout(closeModal, 2000);
+    }
+
+    function showError(title, message){
+        const t = $('error-title');
+        const m = $('error-message');
+        if (t) t.textContent = title;
+        if (m) m.textContent = message;
+        openModal('error-modal');
+        setTimeout(closeModal, 3000);
+    }
+
+    // Util para llamadas fetch con header de AJAX
+    function fetchAjax(url, opts = {}){
+        opts.headers = Object.assign({'X-Requested-With': 'XMLHttpRequest'}, opts.headers || {});
+        return fetch(url, opts).then(async r => {
+            const text = await r.text();
+            try {
+                return JSON.parse(text);
+            } catch (err) {
+                // Mostrar modal de error específico para ayudar al debugging
+                console.error('Respuesta no es JSON válido:', text);
+                try { showError('Error', 'Formato JSON inválido'); } catch(e) { /* ignore if showError not ready */ }
+                // Rechazar con el cuerpo para que los handlers puedan inspeccionarlo si lo desean
+                throw { message: 'Formato JSON inválido', body: text, status: r.status };
             }
         });
     }
-});
 
-// ===== Funciones de Modal Específicas =====
-function openCreateModal() {
-    openModal(createModal, createModalOverlay);
-}
+    // Obtener detalles y abrir modal de edición
+    window.editUser = function(id){
+        fetchAjax(`?c=Usuario&a=obtenerDetalles&id=${id}`)
+            .then(raw => {
+                const res = normalizeResponse(raw);
+                if (res.exito){
+                    const user = res.usuario || res.datos;
+                    if (!user) return showError('Error','Respuesta inválida');
+                    $('edit-id').value = user.id_usuario || user.id || '';
+                    $('edit-nombres').value = user.nombre || user.nombres || '';
+                    $('edit-apellidos').value = user.apellido || user.apellidos || '';
+                    $('edit-documento').value = user.documento || '';
+                    $('edit-tipo-documento').value = user.tipo_documento || 'DNI';
+                    $('edit-correo').value = user.correo || user.email || '';
+                    $('edit-telefono').value = user.telefono || '';
+                    $('edit-area-trabajo').value = user.area_trabajo || 'Frontend';
+                    $('edit-fecha-inicio').value = user.fecha_inicio || '';
+                    $('edit-tecnologias').value = user.tecnologias || '';
+                    $('edit-rol').value = user.rol || user.rol_nombre || 'Desarrollador';
+                    if ($('edit-contrasena')) $('edit-contrasena').value = '';
+                    if ($('edit-confirmar-contrasena')) $('edit-confirmar-contrasena').value = '';
+                    openModal('edit-modal');
+                } else {
+                    showError('Error', res.mensaje || 'No se pudieron cargar los datos');
+                }
+            }).catch(()=> showError('Error','Error de conexión'));
+    };
 
-function openViewModal(userId) {
-    fetch(`?c=Usuario&a=obtenerDetalles&id=${userId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const user = data.usuario;
-                document.getElementById('view-nombre').textContent = `${user.nombre} ${user.apellido}`;
-                document.getElementById('view-documento').textContent = user.documento || '-';
-                document.getElementById('view-correo').textContent = user.correo || '-';
-                document.getElementById('view-telefono').textContent = user.telefono || '-';
-                document.getElementById('view-area').textContent = user.area_trabajo || '-';
-                document.getElementById('view-contrasena').textContent = user.contrasena_visible || '********';
-                document.getElementById('view-tecnologias').textContent = user.tecnologias || 'No especificado';
-                
-                openModal(viewModal, viewModalOverlay);
-            } else {
-                showError('Error al Cargar', data.message || 'No se pudieron cargar los detalles del usuario.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('Error de Conexión', 'No se pudo conectar con el servidor.');
-        });
-}
+    // Ver usuario
+    window.viewUser = function(id){
+        fetchAjax(`?c=Usuario&a=obtenerDetalles&id=${id}`)
+            .then(raw => {
+                const res = normalizeResponse(raw);
+                if (res.exito){
+                    const user = res.usuario || res.datos;
+                    if (!user) return showError('Error','Respuesta inválida');
+                    $('view-nombre').textContent = `${user.nombre || user.nombres || ''} ${user.apellido || user.apellidos || ''}`.trim();
+                    $('view-documento').textContent = user.documento || 'No especificado';
+                    $('view-correo').textContent = user.correo || user.email || 'No especificado';
+                    $('view-telefono').textContent = user.telefono || 'No especificado';
+                    $('view-area').textContent = user.area_trabajo || 'Frontend';
+                    $('view-password').textContent = '••••••••';
+                    $('view-tecnologias').textContent = user.tecnologias || 'No especificado';
+                    openModal('view-modal');
+                } else {
+                    showError('Error', res.mensaje || 'No se pudieron cargar los datos');
+                }
+            }).catch(()=> showError('Error','Error de conexión'));
+    };
 
-function openConfirmModal(userId, action, title, message) {
-    currentUserId = userId;
-    currentAction = action;
-    
-    document.getElementById('confirm-title').textContent = title;
-    document.getElementById('confirm-message').innerHTML = message;
-    
-    openModal(confirmModal, confirmModalOverlay);
-}
+    // Bloquear/activar/eliminar workflow usando el modal de confirmación existente
+    let currentUserId = null;
+    let currentAction = null; // 'bloquear' | 'activar' | 'eliminar'
 
-function showSuccess(title, message) {
-    document.getElementById('success-title').textContent = title;
-    document.getElementById('success-message').textContent = message;
-    openModal(successModal, successModalOverlay);
-    setTimeout(() => {
-        closeModal(successModal, successModalOverlay);
-        location.reload();
-    }, 2000);
-}
-
-function showError(title, message) {
-    document.getElementById('error-title').textContent = title;
-    document.getElementById('error-message').textContent = message;
-    openModal(errorModal, errorModalOverlay);
-    setTimeout(() => {
-        closeModal(errorModal, errorModalOverlay);
-    }, 3000);
-}
-
-// ===== Cargar Usuarios =====
-function cargarUsuarios() {
-    fetch('?c=Usuario&a=listar')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const activos = data.usuarios.filter(u => u.activo == 1);
-                const inactivos = data.usuarios.filter(u => u.activo == 0);
-                
-                // Actualizar estadísticas
-                document.getElementById('total-usuarios').textContent = data.usuarios.length;
-                document.getElementById('usuarios-activos').textContent = activos.length;
-                document.getElementById('usuarios-bloqueados').textContent = inactivos.length;
-                
-                // Renderizar listas
-                renderUsuarios(activos, 'usuarios-activos-list', true);
-                renderUsuarios(inactivos, 'usuarios-inactivos-list', false);
-            } else {
-                console.error('Error al cargar usuarios:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('Error de Carga', 'No se pudieron cargar los usuarios.');
-        });
-}
-
-function renderUsuarios(usuarios, containerId, esActivo) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    
-    if (usuarios.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No hay usuarios</p>';
-        return;
+    function openConfirm(action, id){
+        currentUserId = id;
+        currentAction = action;
+        // Personalizar título/mensaje según acción
+        const titleMap = {
+            'bloquear': '¿Realmente quieres bloquear?',
+            'activar': '¿Realmente quieres activar?',
+            'eliminar': '¿Realmente quieres eliminar?'
+        };
+        const msgMap = {
+            'bloquear': 'Esta acción impedirá que el usuario inicie sesión.',
+            'activar': 'El usuario podrá acceder al sistema nuevamente.',
+            'eliminar': 'Esta acción no se puede deshacer. Las tareas permanecerán desvinculadas.'
+        };
+        const title = titleMap[action] || 'Confirmar acción';
+        const message = msgMap[action] || '';
+        // El modal existente usa id 'block-confirmation-modal' y botón 'confirm-block-btn'
+        const modalBodyTitle = document.querySelector('#block-confirmation-modal h2');
+        const modalBodyP = document.querySelector('#block-confirmation-modal .modal-body p');
+        if (modalBodyTitle) modalBodyTitle.textContent = title;
+        if (modalBodyP) modalBodyP.innerHTML = message;
+        openModal('block-confirmation-modal');
     }
-    
-    usuarios.forEach(user => {
-        const userCard = document.createElement('div');
-        userCard.className = 'user-card';
-        
-        userCard.innerHTML = `
-            <div class="user-info">
-                <h3>${user.nombre} ${user.apellido}</h3>
-                <p>${user.area_trabajo || 'Sin área'} - ${user.tecnologias || 'Sin tecnologías'}</p>
-            </div>
-            <div class="user-actions">
-                <button class="btn-view" onclick="openViewModal(${user.id})" title="Ver detalles">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-                ${esActivo ? `
-                    <button class="btn-activate" onclick="openConfirmModal(${user.id}, 'activar', '¿Activar Usuario?', 'El usuario podrá acceder al sistema.')" title="Activar usuario" style="display: none;">
-                        <i class="fa-solid fa-user-check"></i>
-                    </button>
-                    <button class="btn-block" onclick="openConfirmModal(${user.id}, 'bloquear', '¿Cuenta Bloqueada!', 'La cuenta ha sido bloqueada con éxito.')" title="Bloquear usuario">
-                        <i class="fa-solid fa-ban"></i>
-                    </button>
-                ` : `
-                    <button class="btn-activate" onclick="openConfirmModal(${user.id}, 'activar', '¡Cuenta Activada!', 'La cuenta ha sido Activada con éxito.')" title="Activar usuario">
-                        <i class="fa-solid fa-user-check"></i>
-                    </button>
-                    <button class="btn-delete" onclick="openConfirmModal(${user.id}, 'eliminar', '¿Realmente quieres eliminar?', 'Esta acción no se puede deshacer.<br>Los datos eliminados se perderán permanentemente.')" title="Eliminar usuario">
-                        <i class="fa-solid fa-user-xmark"></i>
-                    </button>
-                `}
-            </div>
-        `;
-        
-        container.appendChild(userCard);
-    });
-}
 
-// ===== Crear Usuario =====
-const formCreateUser = document.getElementById('form-create-user');
-if (formCreateUser) {
-    formCreateUser.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(formCreateUser);
-        
-        // Validar contraseñas
-        const password = formData.get('contrasena');
-        const confirmPassword = formData.get('confirmar_contrasena');
-        
-        if (password !== confirmPassword) {
-            showError('Error de Validación', 'Las contraseñas no coinciden.');
-            return;
+    window.blockUser = function(id){ openConfirm('bloquear', id); };
+    window.activateUser = function(id){ openConfirm('activar', id); };
+    window.deleteUser = function(id){ openConfirm('eliminar', id); };
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+        $('confirm-block-btn')?.addEventListener('click', ()=>{
+            if (!currentUserId || !currentAction) return closeModal();
+            closeModal();
+            let endpoint = '';
+            switch (currentAction){
+                case 'bloquear': endpoint = `?c=Usuario&a=bloquear&id=${currentUserId}`; break;
+                case 'activar': endpoint = `?c=Usuario&a=activar&id=${currentUserId}`; break;
+                case 'eliminar': endpoint = `?c=Usuario&a=eliminar&id=${currentUserId}`; break;
+                default: return;
+            }
+            fetchAjax(endpoint, { method: 'POST' })
+                .then(raw => {
+                    const res = normalizeResponse(raw);
+                    if (res.exito){
+                        // Mostrar modal de éxito según acción
+                        if (currentAction === 'eliminar') openModal('block-success-modal');
+                        else if (currentAction === 'activar') openModal('activate-success-modal');
+                        else openModal('block-success-modal');
+                        setTimeout(()=>{ closeModal(); location.reload(); }, 1500);
+                    } else {
+                        showError('Error', res.mensaje || 'No se pudo completar la acción');
+                    }
+                }).catch(err => {
+                    console.error('Error en confirm action:', err);
+                    if (err && err.body) console.error('Response body:', err.body);
+                    showError('Error','Error de conexión o respuesta inválida');
+                });
+        });
+    });
+
+    // Crear usuario
+    const createForm = $('create-form');
+    if (createForm){
+        createForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            const fd = new FormData(this);
+            if (fd.get('contrasena') !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
+            fetchAjax('?c=Usuario&a=crear',{ method: 'POST', body: fd })
+                .then(raw=>{
+                    const res = normalizeResponse(raw);
+                    if (res.exito){ closeModal(); showSuccess('¡Usuario Creado!','El usuario ha sido creado exitosamente.'); setTimeout(()=>location.reload(),1500); }
+                    else showError('Error', res.mensaje || 'No se pudo crear');
+                }).catch(()=> showError('Error','Error de conexión'));
+        });
+    }
+
+    // Fallback global submit handler (captura formularios si por alguna razón los listeners específicos no se adjuntaron)
+    document.addEventListener('submit', function(e){
+        try {
+            const id = e.target && e.target.id;
+            if (id === 'create-form') {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                if (fd.get('contrasena') !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
+                fetchAjax('?c=Usuario&a=crear',{ method: 'POST', body: fd })
+                    .then(raw=>{
+                        const res = normalizeResponse(raw);
+                        if (res.exito){ closeModal(); showSuccess('¡Usuario Creado!','El usuario ha sido creado exitosamente.'); setTimeout(()=>location.reload(),1500); }
+                        else showError('Error', res.mensaje || 'No se pudo crear');
+                    }).catch(()=> showError('Error','Error de conexión'));
+            }
+            if (id === 'edit-form') {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const pw = fd.get('contrasena');
+                if (pw && pw !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
+                if (!pw){ fd.delete('contrasena'); fd.delete('confirmar_contrasena'); }
+                fetchAjax('?c=Usuario&a=actualizar',{ method: 'POST', body: fd })
+                    .then(raw=>{
+                        const res = normalizeResponse(raw);
+                        if (res.exito){ closeModal(); showSuccess('¡Usuario Actualizado!','Los datos del usuario han sido actualizados.'); setTimeout(()=>location.reload(),1500); }
+                        else showError('Error', res.mensaje || 'No se pudo actualizar');
+                    }).catch(()=> showError('Error','Error de conexión'));
+            }
+        } catch (err) {
+            console.error('Error en submit fallback:', err);
         }
-        
-        // Enviar datos
-        fetch('?c=Usuario&a=crear', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeAllModals();
-                showSuccess('¡Cuenta Creada!', 'La cuenta ha sido creada con éxito.');
-            } else {
-                showError('Error al Crear', data.message || 'No se pudo crear la cuenta.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('Error de Conexión', 'No se pudo conectar con el servidor.');
-        });
-    });
-}
+    }, true);
 
-// ===== Confirmar Acción =====
-const btnConfirmAction = document.getElementById('btn-confirm-action');
-if (btnConfirmAction) {
-    btnConfirmAction.addEventListener('click', () => {
-        if (!currentUserId || !currentAction) {
-            closeAllModals();
-            return;
-        }
-        
-        let endpoint = '';
-        let successTitle = '';
-        let successMessage = '';
-        
-        switch (currentAction) {
-            case 'bloquear':
-                endpoint = `?c=Usuario&a=bloquear&id=${currentUserId}`;
-                successTitle = '¡Cuenta Bloqueada!';
-                successMessage = 'La cuenta ha sido bloqueada con éxito.';
-                break;
-            case 'activar':
-                endpoint = `?c=Usuario&a=activar&id=${currentUserId}`;
-                successTitle = '¡Cuenta Activada!';
-                successMessage = 'La cuenta ha sido Activada con éxito.';
-                break;
-            case 'eliminar':
-                endpoint = `?c=Usuario&a=eliminar&id=${currentUserId}`;
-                successTitle = '¡Usuario Eliminado!';
-                successMessage = 'El usuario ha sido eliminado permanentemente.';
-                break;
-        }
-        
-        fetch(endpoint, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeAllModals();
-                showSuccess(successTitle, successMessage);
-            } else {
-                closeAllModals();
-                showError('Error en la Operación', data.message || 'No se pudo completar la operación.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            closeAllModals();
-            showError('Error de Conexión', 'No se pudo conectar con el servidor.');
+    // Editar usuario
+    const editForm = $('edit-form');
+    if (editForm){
+        editForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            const fd = new FormData(this);
+            const pw = fd.get('contrasena');
+            if (pw && pw !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
+            if (!pw){ fd.delete('contrasena'); fd.delete('confirmar_contrasena'); }
+            fetchAjax('?c=Usuario&a=actualizar',{ method: 'POST', body: fd })
+                .then(raw=>{
+                    const res = normalizeResponse(raw);
+                    if (res.exito){ closeModal(); showSuccess('¡Usuario Actualizado!','Los datos del usuario han sido actualizados.'); setTimeout(()=>location.reload(),1500); }
+                    else showError('Error', res.mensaje || 'No se pudo actualizar');
+                }).catch(()=> showError('Error','Error de conexión'));
         });
-    });
-}
+    }
 
-// ===== Cargar usuarios al iniciar =====
-document.addEventListener('DOMContentLoaded', () => {
-    cargarUsuarios();
-});
+    // Cerrar modales
+    document.addEventListener('click', function(e){
+        if (e.target.classList.contains('close-modal-btn') || e.target.classList.contains('modal-overlay')) closeModal();
+    });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+
+})();
+

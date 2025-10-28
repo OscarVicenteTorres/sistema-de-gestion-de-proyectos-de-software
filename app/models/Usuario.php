@@ -46,9 +46,12 @@ class Usuario {
             $parametros[':area_trabajo'] = '%' . strtolower($filtros['area_trabajo']) . '%';
         }
         
-        
-        $condiciones[] = "u.activo = 1";
-        
+        // Por defecto no forzamos filtrar por activo; permitimos devolver ambos estados
+        // Si se pasa el filtro 'activo' lo aplicamos como condición
+        if (isset($filtros['activo'])) {
+            $condiciones[] = "u.activo = :activo";
+            $parametros[':activo'] = $filtros['activo'];
+        }
         if (!empty($condiciones)) {
             $sql .= " WHERE " . implode(" AND ", $condiciones);
         }
@@ -58,6 +61,44 @@ class Usuario {
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($parametros);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Desvincula (pone NULL) las tareas asignadas a un usuario antes de eliminarlo.
+     * Esto preserva el historial de tareas sin eliminar registros.
+     */
+    public function desvincularTareas($id) {
+        $sql = "UPDATE tareas SET id_usuario = NULL WHERE id_usuario = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    /**
+     * Elimina un usuario dentro de una transacción: desvincula tareas y elimina el registro.
+     * Esto asegura consistencia: si falla la eliminación, se revierte la desvinculación.
+     */
+    public function eliminarConTransaccion($id) {
+        try {
+            $this->conn->beginTransaction();
+
+            $stmt = $this->conn->prepare("UPDATE tareas SET id_usuario = NULL WHERE id_usuario = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $stmt2 = $this->conn->prepare("DELETE FROM usuarios WHERE id_usuario = :id");
+            $stmt2->bindParam(':id', $id);
+            $stmt2->execute();
+
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+            }
+            error_log('Error en eliminarConTransaccion: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function obtenerPorId($id) {

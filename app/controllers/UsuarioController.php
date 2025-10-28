@@ -166,13 +166,8 @@ class UsuarioController extends BaseApiController {
             if (!$id) {
                 return ['exito' => false, 'mensaje' => 'ID de usuario no proporcionado'];
             }
-
-            // Verificar si el usuario tiene tareas
-            if ($this->usuarioModel->contarTareasAsignadas($id) > 0) {
-                return ['exito' => false, 'mensaje' => 'No se puede eliminar: el usuario tiene tareas asignadas. Considere bloquearlo.'];
-            }
-
-            $resultado = $this->usuarioModel->eliminar($id);
+            // Eliminación segura en transacción: desvincula tareas y borra el usuario.
+            $resultado = $this->usuarioModel->eliminarConTransaccion($id);
             return $resultado
                 ? ['mensaje' => 'Usuario eliminado permanentemente']
                 : ['exito' => false, 'mensaje' => 'Error al eliminar el usuario'];
