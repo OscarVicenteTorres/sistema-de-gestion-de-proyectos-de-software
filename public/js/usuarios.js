@@ -51,7 +51,7 @@
         setTimeout(closeModal, 3000);
     }
 
-    // Util para llamadas fetch con header de AJAX
+    // [CORREGIDO] Util para llamadas fetch con header de AJAX (versión robusta)
     function fetchAjax(url, opts = {}){
         opts.headers = Object.assign({'X-Requested-With': 'XMLHttpRequest'}, opts.headers || {});
         return fetch(url, opts).then(async r => {
@@ -61,8 +61,7 @@
             } catch (err) {
                 // Mostrar modal de error específico para ayudar al debugging
                 console.error('Respuesta no es JSON válido:', text);
-                try { showError('Error', 'Formato JSON inválido'); } catch(e) { /* ignore if showError not ready */ }
-                // Rechazar con el cuerpo para que los handlers puedan inspeccionarlo si lo desean
+                try { showError('Error', 'Formato JSON inválido'); } catch(e) { /* ignore */ }
                 throw { message: 'Formato JSON inválido', body: text, status: r.status };
             }
         });
@@ -118,13 +117,14 @@
             }).catch(()=> showError('Error','Error de conexión'));
     };
 
-    // Bloquear/activar/eliminar workflow usando el modal de confirmación existente
+    // [CORREGIDO] Bloquear/activar/eliminar workflow usando el modal de confirmación existente
     let currentUserId = null;
     let currentAction = null; // 'bloquear' | 'activar' | 'eliminar'
 
     function openConfirm(action, id){
         currentUserId = id;
         currentAction = action;
+        
         // Personalizar título/mensaje según acción
         const titleMap = {
             'bloquear': '¿Realmente quieres bloquear?',
@@ -138,115 +138,96 @@
         };
         const title = titleMap[action] || 'Confirmar acción';
         const message = msgMap[action] || '';
-        // El modal existente usa id 'block-confirmation-modal' y botón 'confirm-block-btn'
+        
+        // El modal existente usa id 'block-confirmation-modal'
         const modalBodyTitle = document.querySelector('#block-confirmation-modal h2');
         const modalBodyP = document.querySelector('#block-confirmation-modal .modal-body p');
         if (modalBodyTitle) modalBodyTitle.textContent = title;
         if (modalBodyP) modalBodyP.innerHTML = message;
+        
         openModal('block-confirmation-modal');
     }
 
+    // [CORREGIDO] Funciones de ventana unificadas
     window.blockUser = function(id){ openConfirm('bloquear', id); };
     window.activateUser = function(id){ openConfirm('activar', id); };
     window.deleteUser = function(id){ openConfirm('eliminar', id); };
 
+    // [CORREGIDO] Mover todos los listeners al DOMContentLoaded
     document.addEventListener('DOMContentLoaded', ()=>{
+        
+        // Listener para el botón de confirmación genérico
         $('confirm-block-btn')?.addEventListener('click', ()=>{
             if (!currentUserId || !currentAction) return closeModal();
             closeModal();
             let endpoint = '';
+            
+            // Determinar qué endpoint usar basado en la acción guardada
             switch (currentAction){
                 case 'bloquear': endpoint = `?c=Usuario&a=bloquear&id=${currentUserId}`; break;
                 case 'activar': endpoint = `?c=Usuario&a=activar&id=${currentUserId}`; break;
                 case 'eliminar': endpoint = `?c=Usuario&a=eliminar&id=${currentUserId}`; break;
                 default: return;
             }
+            
             fetchAjax(endpoint, { method: 'POST' })
                 .then(raw => {
                     const res = normalizeResponse(raw);
                     if (res.exito){
-                        // Mostrar modal de éxito según acción
-                        if (currentAction === 'eliminar') openModal('block-success-modal');
-                        else if (currentAction === 'activar') openModal('activate-success-modal');
-                        else openModal('block-success-modal');
+                        // Mostrar modal de éxito (reutilizando los que tienes)
+                        if (currentAction === 'activar') {
+                            openModal('activate-success-modal');
+                        } else {
+                            // 'bloquear' y 'eliminar' pueden compartir el modal de éxito de bloqueo
+                            openModal('block-success-modal'); 
+                        }
                         setTimeout(()=>{ closeModal(); location.reload(); }, 1500);
                     } else {
                         showError('Error', res.mensaje || 'No se pudo completar la acción');
                     }
                 }).catch(err => {
                     console.error('Error en confirm action:', err);
-                    if (err && err.body) console.error('Response body:', err.body);
                     showError('Error','Error de conexión o respuesta inválida');
                 });
         });
-    });
 
-    // Crear usuario
-    const createForm = $('create-form');
-    if (createForm){
-        createForm.addEventListener('submit', function(e){
-            e.preventDefault();
-            const fd = new FormData(this);
-            if (fd.get('contrasena') !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
-            fetchAjax('?c=Usuario&a=crear',{ method: 'POST', body: fd })
-                .then(raw=>{
-                    const res = normalizeResponse(raw);
-                    if (res.exito){ closeModal(); showSuccess('¡Usuario Creado!','El usuario ha sido creado exitosamente.'); setTimeout(()=>location.reload(),1500); }
-                    else showError('Error', res.mensaje || 'No se pudo crear');
-                }).catch(()=> showError('Error','Error de conexión'));
-        });
-    }
-
-    // Fallback global submit handler (captura formularios si por alguna razón los listeners específicos no se adjuntaron)
-    document.addEventListener('submit', function(e){
-        try {
-            const id = e.target && e.target.id;
-            if (id === 'create-form') {
+        // Crear usuario
+        const createForm = $('create-form');
+        if (createForm){
+            createForm.addEventListener('submit', function(e){
                 e.preventDefault();
-                const fd = new FormData(e.target);
+                const fd = new FormData(this);
                 if (fd.get('contrasena') !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
+                
                 fetchAjax('?c=Usuario&a=crear',{ method: 'POST', body: fd })
                     .then(raw=>{
                         const res = normalizeResponse(raw);
                         if (res.exito){ closeModal(); showSuccess('¡Usuario Creado!','El usuario ha sido creado exitosamente.'); setTimeout(()=>location.reload(),1500); }
                         else showError('Error', res.mensaje || 'No se pudo crear');
                     }).catch(()=> showError('Error','Error de conexión'));
-            }
-            if (id === 'edit-form') {
+            });
+        }
+
+        // Editar usuario
+        const editForm = $('edit-form');
+        if (editForm){
+            editForm.addEventListener('submit', function(e){
                 e.preventDefault();
-                const fd = new FormData(e.target);
+                const fd = new FormData(this);
                 const pw = fd.get('contrasena');
                 if (pw && pw !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
                 if (!pw){ fd.delete('contrasena'); fd.delete('confirmar_contrasena'); }
+                
                 fetchAjax('?c=Usuario&a=actualizar',{ method: 'POST', body: fd })
                     .then(raw=>{
                         const res = normalizeResponse(raw);
                         if (res.exito){ closeModal(); showSuccess('¡Usuario Actualizado!','Los datos del usuario han sido actualizados.'); setTimeout(()=>location.reload(),1500); }
                         else showError('Error', res.mensaje || 'No se pudo actualizar');
                     }).catch(()=> showError('Error','Error de conexión'));
-            }
-        } catch (err) {
-            console.error('Error en submit fallback:', err);
+            });
         }
-    }, true);
+    });
 
-    // Editar usuario
-    const editForm = $('edit-form');
-    if (editForm){
-        editForm.addEventListener('submit', function(e){
-            e.preventDefault();
-            const fd = new FormData(this);
-            const pw = fd.get('contrasena');
-            if (pw && pw !== fd.get('confirmar_contrasena')) return showError('Error','Las contraseñas no coinciden');
-            if (!pw){ fd.delete('contrasena'); fd.delete('confirmar_contrasena'); }
-            fetchAjax('?c=Usuario&a=actualizar',{ method: 'POST', body: fd })
-                .then(raw=>{
-                    const res = normalizeResponse(raw);
-                    if (res.exito){ closeModal(); showSuccess('¡Usuario Actualizado!','Los datos del usuario han sido actualizados.'); setTimeout(()=>location.reload(),1500); }
-                    else showError('Error', res.mensaje || 'No se pudo actualizar');
-                }).catch(()=> showError('Error','Error de conexión'));
-        });
-    }
 
     // Cerrar modales
     document.addEventListener('click', function(e){
@@ -255,4 +236,3 @@
     document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
 
 })();
-
