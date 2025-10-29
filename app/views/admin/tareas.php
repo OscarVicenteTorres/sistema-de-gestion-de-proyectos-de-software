@@ -16,7 +16,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo asset('css/admin/base.css'); ?>">
     <link rel="stylesheet" href="<?php echo asset('css/admin/menu.css'); ?>">
-    <link rel="stylesheet" href="<?php echo asset('css/admin/dashboard-admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/admin/tareas.css'); ?>">
     <style>
         
         .vista-inicial { display: block; }
@@ -193,31 +193,24 @@
                     </button>
                 </div>
 
-                <!-- Botones de Acción -->
                 <header class="main-header">
-                    <div class="header-actions d-flex gap-3 align-items-center flex-wrap">
-                        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnNuevaTarea">
-                            <i class="fas fa-plus me-2"></i> Crear Tarea
-                        </button>
-                        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnModificarTarea">
-                            <i class="fas fa-edit me-2"></i> Modificar Tarea
-                        </button>
-                        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnEliminarTarea">
-                            <i class="fas fa-trash me-2"></i> Eliminar Tarea
-                        </button>
-                        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnJustificaciones">
-                            <i class="fas fa-file-alt me-2"></i> Justificaciones
-                        </button>
-                    </div>
-                    <div class="search-wrapper mt-3">
-                        <div class="input-group shadow-sm" style="max-width: 400px;">
-                            <span class="input-group-text bg-white">
-                                <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                            </span>
-                            <input type="text" id="buscarTarea" class="form-control" placeholder="Buscar tarea...">
-                        </div>
-                    </div>
-                </header>
+    <div class="header-actions d-flex gap-3 align-items-center flex-wrap">
+        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnNuevaTarea">
+    <i class="fas fa-plus me-2"></i> Crear Tarea
+</button>
+        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnModificarTarea">
+            <i class="fas fa-edit me-2"></i> Modificar Tarea
+        </button>
+        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnEliminarTarea">
+            <i class="fas fa-trash me-2"></i> Eliminar Tarea
+        </button>
+        <button class="btn btn-warning text-dark fw-bold shadow-sm" id="btnJustificaciones" data-bs-toggle="modal" data-bs-target="#modalJustificaciones">
+            <i class="fas fa-file-alt me-2"></i> Justificaciones
+        </button>
+    </div>
+    <div class="search-wrapper mt-3">
+        </div>
+</header>
 
                 <!-- Tabla de Tareas -->
                 <section class="projects-section">
@@ -226,12 +219,8 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th style="width: 50px;"></th>
-                                    <th>Proyecto</th>
-                                    <th>Categoría</th>
-                                    <th>Progreso (Proyecto)</th>
                                     <th>Tarea</th>
-                                    <th>Asignado</th>
-                                    <th>Área</th>
+                                    <th>desarrollador</th>
                                     <th>Progreso</th>
                                     <th>Estado</th>
                                     <th>Fecha Límite</th>
@@ -255,32 +244,25 @@
 
 
     <!-- Modal Crear/Editar Tarea -->
-    <div class="modal-overlay" id="modalTarea">
-        <div class="modal">
+    <div class="modal fade" id="modalTarea" tabindex="-1" aria-labelledby="modalTareaTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTareaTitle">Asignar Tareas</h2>
-                <button class="close-modal-btn" onclick="cerrarModal('modalTarea')">&times;</button>
+                <h5 class="modal-title" id="modalTareaTitle">Asignar Tareas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form class="modal-form" id="formTarea">
+                <form id="formTarea">
                     <input type="hidden" id="tareaId">
                     <input type="hidden" id="tareaProyectoId">
-
-                    <div class="form-group">
-                        <label>Nombre de la Tarea</label>
-                        <input type="text" id="tareaTitulo" placeholder="Nombre de la Tarea" required>
+                    
+                    <div class="mb-3">
+                        <label for="tareaTitulo" class="form-label">Nombre de la Tarea</label>
+                        <input type="text" class="form-control" id="tareaTitulo" required>
                     </div>
-
-                    <div class="form-group">
-                        <label>Desarrollador</label>
-                        <select id="tareaUsuario" required>
-                            <option value="">Selecciona un desarrollador</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Área Asignada</label>
-                        <select id="tareaArea" required>
+                                        <div class="mb-3">
+                        <label for="tareaArea" class="form-label">Área Asignada</label>
+                        <select class="form-select" id="tareaArea" required>
                             <option value="">Selecciona un Área</option>
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
@@ -288,83 +270,128 @@
                         </select>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Fecha de Inicio</label>
-                            <input type="date" id="tareaFechaInicio">
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha Final</label>
-                            <input type="date" id="tareaFechaLimite">
-                        </div>
+                    <div class="mb-3">
+                        <label for="tareaUsuario" class="form-label">Desarrollador</label>
+                        <select class="form-select" id="tareaUsuario" required>
+                            <option value="">Selecciona un desarrollador</option>
+                            
+                        </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Descripción / Objetivo Principal</label>
-                        <textarea id="tareaDescripcion" rows="4"></textarea>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tareaFechaInicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="tareaFechaInicio">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tareaFechaLimite" class="form-label">Fecha Límite</label>
+                            <input type="date" class="form-control" id="tareaFechaLimite" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tareaDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="tareaDescripcion" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="form-submit-btn" id="btnGuardarTarea">Crear Tarea</button>
+                    <div class="d-grid">
+                         <button type="submit" class="btn btn-warning text-dark fw-bold" id="btnGuardarTarea">Crear Tarea</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Modal Justificaciones -->
-    <div class="modal-overlay" id="modalJustificaciones">
-        <div class="modal" style="max-width: 900px;">
+  <div class="modal fade" id="modalJustificaciones" tabindex="-1" aria-labelledby="modalJustificacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2>Justificaciones de Tareas</h2>
-                <button class="close-modal-btn" onclick="cerrarModal('modalJustificaciones')">&times;</button>
+                <h5 class="modal-title" id="modalJustificacionesLabel">Justificaciones de Tareas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Tarea</th>
-                                <th>Desarrollador</th>
-                                <th>Motivo</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="justificacionesTableBody">
-                            <tr>
-                                <td colspan="5" class="text-center py-4">
-                                    <div class="spinner-border text-warning" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Contenedor para tarjetas de justificaciones (renderizado por JS) -->
+                <div id="justificacionesContainer" class="d-flex flex-column gap-3">
+                    <div class="text-center text-muted py-4">Las justificaciones del proyecto seleccionado aparecerán aquí.</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+            <!-- Modal: Filtro / Detalle de Estadísticas (lista de tareas) -->
+            <div class="modal fade" id="modalFiltroTareas" tabindex="-1" aria-labelledby="modalFiltroTareasLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalFiltroTareasLabel">Tareas</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formFiltroTareas" class="mb-3">
+                                <div class="row g-2">
+                                    <div class="col-md-5">
+                                        <input type="text" id="filtroTitulo" class="form-control" placeholder="Buscar por nombre de tarea">
+                                    </div>
+                                    <!-- <div class="col-md-5">
+                                        <input type="text" id="filtroDescripcion" class="form-control" placeholder="Buscar por descripción">
+                                    </div> -->
+                                    <div class="col-md-2 d-grid">
+                                        <button type="submit" class="btn btn-warning text-dark">Buscar</button>
+                                    </div>
+                                </div>
+                                <!-- <div class="row mt-2 g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Fecha creación (desde - hasta)</label>
+                                        <div class="d-flex gap-2">
+                                            <input type="date" id="filtroFechaCreacionFrom" class="form-control">
+                                            <input type="date" id="filtroFechaCreacionTo" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Fecha límite (desde - hasta)</label>
+                                        <div class="d-flex gap-2">
+                                            <input type="date" id="filtroFechaLimiteFrom" class="form-control">
+                                            <input type="date" id="filtroFechaLimiteTo" class="form-control">
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </form>
 
-    <!-- Modal Confirmación Eliminar -->
-    <div class="modal-overlay" id="modalConfirmar">
-        <div class="modal modal-small">
-            <div class="modal-body text-center">
+                            <div id="resultadoFiltroTareas">
+                                <div class="text-center py-4 text-muted">Use el formulario para filtrar tareas del proyecto seleccionado.</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
                 <div class="mb-3">
                     <i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 48px;"></i>
                 </div>
-                <h4 class="mb-3">¿Realmente quieres eliminar?</h4>
-                <p class="text-muted mb-4">Esta acción no se puede deshacer.<br>Los datos eliminados se perderán permanentemente.</p>
+                <h4 class="mb-3" id="modalConfirmarLabel">¿Realmente quieres eliminar?</h4>
+                <p class="text-muted mb-4">Esta acción no se puede deshacer.</p>
                 <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-secondary" onclick="cerrarModal('modalConfirmar')">Cancelar</button>
-                    <button class="btn btn-warning text-dark fw-bold" id="btnConfirmarEliminar">Confirmar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning text-dark fw-bold" id="btnConfirmarEliminar">Confirmar</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal Éxito -->
-    <div class="modal-overlay" id="modalExito">
-        <div class="modal modal-small">
-            <div class="modal-body text-center">
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="exitoTitulo" aria-hidden="true">
+     <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
                 <div class="mb-3">
                     <i class="fa-solid fa-circle-check text-success" style="font-size: 64px;"></i>
                 </div>
@@ -373,15 +400,11 @@
             </div>
         </div>
     </div>
-
+</div>
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<<<<<<< HEAD
     <!-- Custom JS -->
     <script src="<?php echo asset('js/tareas.js'); ?>"></script>
-=======
-    
->>>>>>> 05075b4 (Exportacion de Proyectos primera fase)
 </body>
 
 </html>

@@ -27,7 +27,14 @@ class TareaController extends BaseApiController {
     // GET /index.php?c=Tarea&a=listar
     public function listar(): void {
         $this->ejecutarOperacion(function() {
-            $filtros = $this->obtenerFiltros(['proyecto_id', 'area', 'estado', 'usuario_id']);
+            // Agregar más filtros posibles desde la petición para que la UI pueda pedir listados filtrados
+            $filtros = $this->obtenerFiltros([
+                'proyecto_id', 'area', 'estado', 'usuario_id',
+                'titulo_like', 'descripcion_like',
+                'fecha_creacion_from', 'fecha_creacion_to',
+                'fecha_limite_from', 'fecha_limite_to'
+            ]);
+
             $tareas = $this->tareaModel->obtenerTodas($filtros);
             
             return [
@@ -42,7 +49,9 @@ class TareaController extends BaseApiController {
     // GET /index.php?c=Tarea&a=estadisticas
     public function estadisticas(): void {
         $this->ejecutarOperacion(function() {
-            return $this->tareaModel->obtenerEstadisticas();
+            // Aceptar proyecto_id opcional para escopar las estadísticas al proyecto seleccionado
+            $proyectoId = isset($_GET['proyecto_id']) && is_numeric($_GET['proyecto_id']) ? intval($_GET['proyecto_id']) : null;
+            return $this->tareaModel->obtenerEstadisticas($proyectoId);
         });
     }
 
@@ -185,9 +194,8 @@ class TareaController extends BaseApiController {
             }
         }
 
-        // Validar área
-        $areasValidas = ['Frontend', 'Backend', 'Infraestructura', 'UI/UX', 'QA'];
-        if (!in_array($sanitizado['area_asignada'], $areasValidas)) {
+        // Validar área usando la constante del modelo
+        if (!in_array($sanitizado['area_asignada'], Tarea::AREAS_PERMITIDAS)) {
             $this->jsonError('Área asignada no válida');
         }
 

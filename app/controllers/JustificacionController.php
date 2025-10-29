@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../models/JustificacionTarea.php";
-require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . "/../models/Tarea.php";
+require_once __DIR__ . '/../../core/BaseApiController.php';
 
 /**
  * CONTROLADOR JUSTIFICACION - BACKEND PARA ADMINISTRADOR
@@ -9,14 +10,16 @@ require_once __DIR__ . '/../../core/Controller.php';
  * El administrador puede aprobar o rechazar solicitudes de extensión de tiempo.
  * Todos los métodos retornan JSON para fácil integración con frontend.
  */
-class JustificacionController extends Controller {
+class JustificacionController extends BaseApiController {
     private $justificacionModel;
+    private $tareaModel;
 
     public function __construct() {
         $this->justificacionModel = new JustificacionTarea();
-        
-        // Verificar que el usuario sea administrador
-        $this->verificarAdmin();
+        $this->tareaModel = new Tarea();
+        // NOTA: no verificamos rol aquí para permitir que los desarrolladores
+        // creen justificaciones desde su dashboard. Los métodos que requieren
+        // permisos de admin llamarán a $this->verificarAdmin() explícitamente.
     }
 
     /**
@@ -25,6 +28,8 @@ class JustificacionController extends Controller {
      * Método: GET
      */
     public function index() {
+        // Admin only
+        $this->verificarAdmin();
         try {
             // Obtener filtros de la URL
             $filtros = [
@@ -40,6 +45,10 @@ class JustificacionController extends Controller {
             });
             
             // Obtener justificaciones y estadísticas
+            // Aceptamos filtro opcional proyecto_id para mostrar solo justificaciones del proyecto
+            if (!empty($_GET['proyecto_id']) && is_numeric($_GET['proyecto_id'])) {
+                $filtros['proyecto_id'] = intval($_GET['proyecto_id']);
+            }
             $justificaciones = $this->justificacionModel->obtenerTodas($filtros);
             $estadisticas = $this->justificacionModel->obtenerEstadisticas();
             $opciones = $this->justificacionModel->obtenerOpcionesFormulario();
@@ -79,6 +88,8 @@ class JustificacionController extends Controller {
      * Método: GET
      */
     public function detalle() {
+        // Admin only
+        $this->verificarAdmin();
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
@@ -133,6 +144,8 @@ class JustificacionController extends Controller {
      * Método: POST
      */
     public function aprobar() {
+        // Admin only
+        $this->verificarAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->esAjax()) {
                 header('Content-Type: application/json');
@@ -143,8 +156,10 @@ class JustificacionController extends Controller {
             return;
         }
         
-        $id = $_POST['id'] ?? null;
-        $comentarios = $_POST['comentarios'] ?? '';
+    // Acepta form-data: id, comentarios y opcionalmente nueva_fecha_confirmada (YYYY-MM-DD)
+    $id = $_POST['id'] ?? null;
+    $comentarios = $_POST['comentarios'] ?? '';
+    $nueva_fecha_confirmada = $_POST['nueva_fecha_confirmada'] ?? null;
         $admin_id = $_SESSION['usuario']['id_usuario'];
         
         if (!$id) {
@@ -160,7 +175,7 @@ class JustificacionController extends Controller {
         }
         
         try {
-            $resultado = $this->justificacionModel->aprobar($id, $admin_id, $comentarios);
+            $resultado = $this->justificacionModel->aprobar($id, $admin_id, $comentarios, $nueva_fecha_confirmada);
             
             if ($this->esAjax()) {
                 header('Content-Type: application/json');
@@ -190,11 +205,45 @@ class JustificacionController extends Controller {
     }
 
     /**
+     * Crea una justificación (para desarrolladores)
+     * URL: /index.php?c=Justificacion&a=crear
+     * Método: POST
+     */
+    public function crear() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonError('Método no permitido', [], 405);
+        }
+
+        if (!isset($_SESSION['usuario']) || empty($_SESSION['usuario']['id_usuario'])) {
+            $this->jsonError('Acceso denegado: inicie sesión', [], 401);
+        }
+
+        $datos = $this->getInput();
+        $this->validarCampos($datos, ['id_tarea', 'motivo', 'nueva_fecha_limite']);
+
+        $this->ejecutarOperacion(function() use ($datos) {
+            $tarea = $this->tareaModel->obtenerPorId($datos['id_tarea']);
+            if (!$tarea) {
+                return ['exito' => false, 'mensaje' => 'Tarea no encontrada'];
+            }
+
+            $usuarioId = $_SESSION['usuario']['id_usuario'];
+            if ((int)$tarea['id_usuario'] !== (int)$usuarioId) {
+                return ['exito' => false, 'mensaje' => 'Solo el desarrollador asignado puede solicitar extensión para esta tarea'];
+            }
+
+            return $this->justificacionModel->crear($datos);
+        });
+    }
+
+    /**
      * Rechaza una justificación
      * URL: /index.php?c=Justificacion&a=rechazar
      * Método: POST
      */
     public function rechazar() {
+        // Admin only
+        $this->verificarAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->esAjax()) {
                 header('Content-Type: application/json');
@@ -270,6 +319,8 @@ class JustificacionController extends Controller {
      * Método: POST
      */
     public function procesarLote() {
+        // Admin only
+        $this->verificarAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->esAjax()) {
                 header('Content-Type: application/json');
@@ -386,6 +437,8 @@ class JustificacionController extends Controller {
      * Método: GET
      */
     public function estadisticas() {
+        // Admin only
+        $this->verificarAdmin();
         try {
             $estadisticas = $this->justificacionModel->obtenerEstadisticas();
             
@@ -403,26 +456,4 @@ class JustificacionController extends Controller {
         }
     }
 
-    /**
-     * Verifica que el usuario actual sea administrador
-     */
-    private function verificarAdmin() {
-        if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Admin') {
-            if ($this->esAjax()) {
-                header('Content-Type: application/json');
-                echo json_encode(['exito' => false, 'mensaje' => 'Acceso denegado']);
-            } else {
-                redirect('Auth', 'login');
-            }
-            exit;
-        }
-    }
-
-    /**
-     * Determina si la petición es AJAX
-     */
-    private function esAjax() {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
 }

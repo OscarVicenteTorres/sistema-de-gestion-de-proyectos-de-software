@@ -2,8 +2,8 @@
 class Database {
     private static $host = "localhost";
     private static $db_name = "prueba_proyectos";
-    private static $username = "root";  // cambia si usas otro usuario
-    private static $password = "";      // cambia si tu MySQL tiene contraseña
+    private static $username = "root";  
+    private static $password = ""; // sin contra en local host
     private static $conn;
 
     public static function connect() {
