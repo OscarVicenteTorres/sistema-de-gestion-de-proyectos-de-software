@@ -56,7 +56,7 @@
                     </button>
 
                     <select id="filter-category" class="form-select form-select-sm shadow-sm" style="width: auto; min-width: 200px;">
-                        <option value="">📁 Categoría</option>
+                        <option value=""> Categoría</option>
                         <option value="Software de gestión">Software de gestión (ERP, inventario, CRM, facturación)</option>
                         <option value="Tienda virtual">Tienda virtual / E-commerce</option>
                         <option value="Landing page">Landing page / Micrositio</option>
@@ -65,7 +65,7 @@
                     </select>
 
                     <select id="filter-progress" class="form-select form-select-sm shadow-sm" style="width: auto; min-width: 180px;">
-                        <option value="">📊 Progreso</option>
+                        <option value=""> Progreso</option>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Investigación">Investigación</option>
                         <option value="Diseño">Diseño</option>

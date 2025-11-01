@@ -1,17 +1,20 @@
-/* Componente: Tablas (extraído de admin/*.css) */
-
+/* Tablas estilo Figma */
 .projects-table-container,
 .projects-section .projects-table-container {
     background-color: var(--color-white);
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .projects-table,
 .table {
     width: 100%;
+    min-width: 100%;
     border-collapse: collapse;
+    table-layout: auto;
 }
 
 .projects-table th, 
@@ -24,6 +27,7 @@
     vertical-align: middle;
 }
 
+/* Header oscuro estilo Figma */
 .projects-table thead,
 .table-dark {
     background-color: var(--color-dark) !important;
@@ -34,8 +38,8 @@
     color: var(--color-primary) !important;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
+    font-size: 11px;
+    letter-spacing: 0.8px;
 }
 
 .projects-table tbody tr,
@@ -45,7 +49,7 @@
 
 .projects-table tbody tr:hover,
 .table-hover tbody tr:hover {
-    background-color: #fefce8;
+    background-color: #fef9e7;
 }
 
 .projects-table tbody tr:last-child td,

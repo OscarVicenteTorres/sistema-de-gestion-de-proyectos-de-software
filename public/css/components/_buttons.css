@@ -1,13 +1,88 @@
-/* Botones base (sobre Bootstrap) */
+/* Botones base */
 .btn {
-  padding: 10px 18px;
+  padding: 11px 22px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-lg);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Botones primarios - amarillo dorado */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-dark);
+}
+
+.btn-primary:hover {
+  background-color: #c28f0d;
+}
+
+/* Botones secundarios */
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+/* Botones de peligro */
+.btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+/* Botones de éxito */
+.btn-success {
+  background-color: var(--color-success);
+  color: var(--color-white);
+}
+
+.btn-success:hover {
+  background-color: #059669;
+}
+
+/* Botones con icono */
+.btn i {
+  font-size: 16px;
+}
+
+/* Botones pequeños */
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+/* Botones grandes */
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 15px;
+}
+
+/* Botones deshabilitados */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }

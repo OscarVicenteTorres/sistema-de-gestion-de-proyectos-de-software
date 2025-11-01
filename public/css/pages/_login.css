@@ -10,7 +10,7 @@
 
 /* 🌌 Fondo con gradiente animado y rejilla sutil */
 body {
-  background: #000028;
+  background: #01013d;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -129,14 +129,9 @@ body {
   color: #fff;
   font-size: 14px;
   transition: 0.3s;
-  box-shadow: inset 0 0 10px rgba(0,0,70,0.4);
 }
 
-.form-group input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 15px rgba(241,196,15,0.5), inset 0 0 6px rgba(241,196,15,0.2);
-}
+
 
 /* 🔘 Botón */
 .btn-login {

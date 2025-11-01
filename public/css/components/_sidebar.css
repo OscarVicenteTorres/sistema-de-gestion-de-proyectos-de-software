@@ -9,6 +9,11 @@
     flex-direction: column;
     box-shadow: var(--shadow-sm);
     border-right: 1px solid var(--color-border);
+    position: sticky; /* permanece visible al hacer scroll */
+    top: 0;
+    left: 0;
+    align-self: flex-start;
+    z-index: 100; /* por encima del contenido */
 }
 
 .sidebar-header {

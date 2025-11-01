@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
         btnConfirmarEliminar.addEventListener('click', ejecutarEliminacion);
     }
     
+    // Botón para abrir Justificaciones (sin Bootstrap)
+    const btnJustificaciones = document.getElementById('btnJustificaciones');
+    if (btnJustificaciones) {
+        btnJustificaciones.addEventListener('click', () => openModal('modalJustificaciones'));
+    }
+    
     const inputBuscarProyecto = document.getElementById('buscarProyecto');
     if (inputBuscarProyecto) {
         inputBuscarProyecto.addEventListener('input', filtrarTablaProyectos);
@@ -84,6 +90,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Llamada inicial para poblar la primera vista.
     cargarProyectos();
     cargarEstadisticasProyectos(); // <-- ¡AQUÍ ESTÁ LA MAGIA!
+
+    // Cerrar modales al hacer clic en el overlay o con ESC
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => closeAllModals());
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAllModals();
+    });
+    // Cerrar con botones .close-modal-btn
+    document.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.modal');
+            if (modal) closeModal(modal.id);
+        });
+    });
 });
 
 
@@ -97,6 +119,33 @@ const AJAX_HEADERS = {
 };
 
 let tareaAEliminar = null; // Variable global para guardar la tarea a eliminar.
+
+// ===================================================================================
+// 2.1. SISTEMA DE MODALES CUSTOM (SIN BOOTSTRAP)
+// ===================================================================================
+function openModal(id) {
+    const modal = document.getElementById(id);
+    const overlay = document.getElementById('modal-overlay');
+    if (!modal || !overlay) return;
+    modal.classList.add('active');
+    overlay.classList.add('active');
+}
+
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    const overlay = document.getElementById('modal-overlay');
+    if (!modal || !overlay) return;
+    modal.classList.remove('active');
+    // Si no quedan otros modales activos, ocultar overlay
+    const anyActive = document.querySelector('.modal.active');
+    if (!anyActive) overlay.classList.remove('active');
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) overlay.classList.remove('active');
+}
 
 
 /**
@@ -338,7 +387,6 @@ function poblarUsuarios(area = null) {
 function abrirModalTarea(modo, tarea = null) {
     const modalEl = document.getElementById('modalTarea');
     if(!modalEl) return;
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     
     const form = document.getElementById('formTarea');
     form.reset();
@@ -355,7 +403,7 @@ function abrirModalTarea(modo, tarea = null) {
         document.getElementById('modalTareaTitle').textContent = 'Crear Tarea';
         document.getElementById('btnGuardarTarea').textContent = 'Crear Tarea';
         // Mostrar modal en crear: el select se habilitará cuando el admin seleccione un área
-        modal.show();
+        openModal('modalTarea');
     } else { // modo 'editar'
         document.getElementById('modalTareaTitle').textContent = 'Editar Tarea';
         document.getElementById('btnGuardarTarea').textContent = 'Guardar cambios';
@@ -371,7 +419,7 @@ function abrirModalTarea(modo, tarea = null) {
             // Cargamos los usuarios del área de la tarea y luego seleccionamos el correcto
             poblarUsuarios(tarea.area_asignada).then(() => {
                 if (selectUsuario) selectUsuario.value = tarea.id_usuario ?? '';
-                modal.show();
+                openModal('modalTarea');
             });
         }
     }
@@ -427,7 +475,7 @@ function manejarSubmitFormulario(e) {
     .then(r => r.json())
     .then(res => {
         if (res.exito) {
-            bootstrap.Modal.getInstance(document.getElementById('modalTarea')).hide();
+            closeModal('modalTarea');
             abrirExito(res.mensaje || 'Operación exitosa');
             if (proyectoId) {
                 cargarTareas(proyectoId);
@@ -450,7 +498,7 @@ function confirmarEliminar(id, proyectoId) {
     tareaAEliminar = { id, proyectoId };
     const modalEl = document.getElementById('modalConfirmar');
     if (!modalEl) return;
-    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    openModal('modalConfirmar');
 }
 
 /**
@@ -463,7 +511,7 @@ function ejecutarEliminacion() {
     fetch(`?c=Tarea&a=eliminar`, { method: 'POST', headers: AJAX_HEADERS, body: JSON.stringify({ id_tarea: id }) })
     .then(r => r.json())
     .then(res => {
-        bootstrap.Modal.getInstance(document.getElementById('modalConfirmar')).hide();
+        closeModal('modalConfirmar');
         if (res.exito) {
             abrirExito(res.mensaje || 'Tarea eliminada');
             if (proyectoId) {
@@ -488,9 +536,8 @@ function abrirExito(mensaje) {
     const modalEl = document.getElementById('modalExito');
     if (!modalEl) return;
     document.getElementById('exitoMensaje').textContent = mensaje;
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
-    setTimeout(() => modal.hide(), 1000);
+    openModal('modalExito');
+    setTimeout(() => closeModal('modalExito'), 1000);
 }
 
 /**
@@ -569,8 +616,7 @@ function abrirModalFiltroPorTipo(statId) {
     // Abrir modal
     const modalEl = document.getElementById('modalFiltroTareas');
     if (!modalEl) return;
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
+    openModal('modalFiltroTareas');
 
     // Ejecutar búsqueda inicial dependiendo del tipo
     const filtrosIniciales = {};

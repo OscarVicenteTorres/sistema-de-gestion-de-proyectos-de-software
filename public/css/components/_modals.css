@@ -1,15 +1,15 @@
-/* Componente: Modales compartidos (migrado y consolidado de admin/modals.css) */
+/* Componente: Modales compartidos - Estilo Figma */
 
 :root {
     --modal-bg: #ffffff;
-    --modal-radius: 12px;
-    --modal-shadow: 0 8px 28px rgba(0,0,0,0.15);
-    --modal-max-width: 680px;
-    --modal-max-height: 80vh;
-    --modal-body-padding: 24px;
-    --modal-small-max-width: 350px;
-    --modal-small-body-padding: 35px 25px;
-    --alert-icon-size: 90px;
+    --modal-radius: 16px;
+    --modal-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --modal-max-width: 700px;
+    --modal-max-height: 85vh;
+    --modal-body-padding: 28px;
+    --modal-small-max-width: 450px;
+    --modal-small-body-padding: 32px 28px;
+    --alert-icon-size: 70px;
 }
 
 /* Overlay */
@@ -19,11 +19,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 9998;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
 }
 
 .modal-overlay.active {
@@ -43,9 +44,8 @@
     z-index: 9999 !important;
     width: 90% !important;
     max-width: var(--modal-max-width) !important;
-    max-height: var(--modal-max-height) !important;
     height: auto !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -53,7 +53,8 @@
     display: block !important;
 }
 
-.modal.active {
+.modal.active,
+.modal.show {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -64,63 +65,75 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    background-color: var(--modal-bg);
+    padding: 20px 28px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background-color: var(--color-dark);
 }
 
-.modal-header h2 {
-    font-size: 24px;
+.modal-header h2,
+.modal-header .modal-title {
+    font-size: 22px;
     font-weight: 600;
     color: var(--color-primary);
     margin: 0;
 }
 
-.close-modal-btn {
+.close-modal-btn,
+.btn-close {
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: 24px;
     cursor: pointer;
-    color: #666;
+    color: var(--color-white);
     transition: all 0.3s ease;
     line-height: 1;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 4px 8px;
 }
 
-.close-modal-btn:hover { 
+.close-modal-btn:hover,
+.btn-close:hover { 
     transform: rotate(90deg);
     color: var(--color-primary);
 }
 
 .modal-body {
     padding: var(--modal-body-padding);
-    max-height: var(--modal-max-height);
-    overflow-y: auto;
+    overflow-y: visible;
     background-color: var(--modal-bg);
 }
 
-/* Small modal & alert - tamaño original */
+/* Small modal & alert - ORIGINAL STYLES */
 .modal-small {
-    max-width: var(--modal-small-max-width) !important;
-    width: var(--modal-small-max-width) !important;
+    max-width: 340px !important;
+    width: 340px !important;
     padding: 0 !important;
+    animation: modalBounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes modalBounceIn {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    70% { transform: translate(-50%, -50%) scale(0.9); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.modal-small .modal-header {
+    display: none; /* No header para modales pequeños */
 }
 
 .modal-small .modal-body { 
-    padding: var(--modal-small-body-padding) !important; 
+    padding: 35px 25px !important;
+    text-align: center;
 }
 
-.text-center { text-align: center; }
+.text-center { 
+    text-align: center; 
+}
 
-/* Alert icon con tamaño original */
+/* Alert icon - ORIGINAL STYLES */
 .alert-icon {
-    width: var(--alert-icon-size);
-    height: var(--alert-icon-size);
+    width: 90px;
+    height: 90px;
     border-radius: 50%; 
     display: flex; 
     align-items: center; 
@@ -136,43 +149,78 @@
 }
 
 .alert-icon.warning { 
-    background: linear-gradient(135deg,#fee2e2 0%,#fecaca 100%); 
-    color:#dc2626; 
-    border:3px solid #fca5a5; 
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
+    color: #dc2626; 
+    border: 3px solid #fca5a5; 
 }
 
 .alert-icon.success { 
-    background: linear-gradient(135deg,#dcfce7 0%,#bbf7d0 100%); 
-    color:#16a34a; 
-    border:3px solid #86efac; 
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); 
+    color: #16a34a; 
+    border: 3px solid #86efac; 
 }
 
 .alert-icon.error { 
-    background: linear-gradient(135deg,#fee2e2 0%,#fecaca 100%); 
-    color:#dc2626; 
-    border:3px solid #fca5a5; 
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
+    color: #dc2626; 
+    border: 3px solid #fca5a5; 
 }
 
-.modal-small h2, 
+/* Texto de modales pequeños */
+.modal-small h2 { 
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
 .modal-small p { 
-    margin-bottom: 16px;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
 .modal-actions { 
-    display:flex; 
-    gap:12px; 
-    justify-content:center; 
-    margin-top: 20px;
+    display: flex; 
+    gap: 12px; 
+    justify-content: center; 
+    margin-top: 24px;
 }
 
 .modal-actions .btn { 
-    min-width:100px; 
+    min-width: 100px; 
     padding: 10px 20px;
-    transition: all 0.3s ease; 
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
 }
 
 .modal-actions .btn:hover { 
-    transform: translateY(-2px); 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal-actions .btn-primary {
+    background-color: #d4a017;
+    color: #1a1a1a;
+}
+
+.modal-actions .btn-primary:hover {
+    background-color: #b8880f;
+}
+
+.modal-actions .btn-secondary {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+
+.modal-actions .btn-secondary:hover {
+    background-color: #d1d5db;
 }
 
 /* Modal de reporte - mantener tamaño original */
@@ -191,24 +239,24 @@
     text-align: center;
 }
 
-/* Sección de alertas en modales */
+/* Sección de alertas en modales - Figma style */
 .alert-section {
     background-color: #fef2f2;
     border: 2px solid #ef4444;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-top: 22px;
 }
 
 .alert-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #dc2626;
     margin-bottom: 4px;
 }
 
 .alert-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     color: #f87171;
     margin-bottom: 16px;
 }
@@ -302,7 +350,7 @@
     margin-bottom: 12px;
 }
 
-/* Responsive */
+/* Responsive - ORIGINAL */
 @media (max-width: 768px) {
     .modal {
         width: 95% !important;
@@ -314,16 +362,40 @@
         padding: 20px !important;
     }
     
+    .modal-small {
+        width: 90% !important;
+        max-width: 90% !important;
+    }
+    
+    .modal-small .modal-body {
+        padding: 30px 20px !important;
+    }
+    
+    .alert-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .alert-icon i {
+        font-size: 40px;
+    }
+    
+    .modal-small h2 {
+        font-size: 18px;
+    }
+    
+    .modal-small p {
+        font-size: 13px;
+    }
+    
     .modal-actions {
         flex-direction: column;
         gap: 10px;
+        margin-top: 20px;
     }
     
     .modal-actions .btn {
         width: 100%;
-    }
-    
-    .modal-small {
-        width: 90% !important;
+        padding: 12px 20px;
     }
 }

@@ -16,8 +16,9 @@
 .accounts-sections {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
     margin-top: 1rem;
+    width: 100%;
 }
 
 .activos-section,
@@ -26,6 +27,8 @@
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
+    width: 100%;
+    overflow-x: auto;
 }
 
 .section-header {

@@ -1,8 +1,9 @@
 :root {
+  /* Paleta solicitada */
   --color-primary: #d4a017;
   --color-secondary: #b8860b;
   --color-dark: #1a1a1a;
-  --color-dark-blue: #09112d;
+  --color-dark-blue: #1e2746; /* legado, por si se usa en secciones oscuras */
   --color-text-primary: #2c2c2c;
   --color-text-secondary: #666666;
   --color-background: #f5f5f5;
@@ -10,9 +11,18 @@
   --color-border: #e0e0e0;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
 
+  /* Sombras según paleta */
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
 /* Reset global para mantener fondos claros */
@@ -24,7 +34,7 @@
 
 body {
   font-family: 'Poppins', sans-serif !important;
-  background-color: #f8f9fa !important;
+  background-color: var(--color-background) !important;
   color: var(--color-text-primary);
   margin: 0;
   padding: 0;
