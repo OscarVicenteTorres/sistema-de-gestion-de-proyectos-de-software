@@ -1,0 +1,7 @@
+/* Sidebar compartido */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}

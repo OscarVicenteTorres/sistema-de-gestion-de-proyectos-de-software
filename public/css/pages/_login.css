@@ -1,0 +1,7 @@
+/* Puente temporal: reutiliza el login actual mientras migramos */
+@import url('../inicio/login.css');
+
+/* Reglas pequeñas opcionales específicas */
+body {
+  font-family: 'Poppins', sans-serif;
+}

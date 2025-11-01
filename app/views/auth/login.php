@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="<?php echo asset('css/inicio/login.css'); ?>">
+    <!-- Un solo CSS de entrada -->
+    <link rel="stylesheet" href="<?php echo asset('css/main.css'); ?>">
 </head>
 
 <body>

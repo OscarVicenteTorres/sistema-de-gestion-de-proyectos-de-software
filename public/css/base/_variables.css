@@ -1,0 +1,15 @@
+:root {
+  --color-primary: #d4a017;
+  --color-secondary: #b8860b;
+  --color-dark: #1a1a1a;
+  --color-text-primary: #2c2c2c;
+  --color-text-secondary: #666666;
+  --color-background: #f5f5f5;
+  --color-white: #ffffff;
+  --color-border: #e0e0e0;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}

@@ -1,0 +1,3 @@
+/* Layout general de dashboard (compartido) */
+.dashboard-container { display: flex; min-height: 100vh; background: #f8f9fa; }
+.main-content { flex: 1; padding: 24px 48px; }

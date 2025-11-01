@@ -1,0 +1,17 @@
+/* Tarjetas y estadísticas */
+.stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1;
+  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card h3 { margin: 0 0 6px; font-weight: 700; color: var(--color-dark); }
+.stat-card p { margin: 0; color: var(--color-text-secondary); }
