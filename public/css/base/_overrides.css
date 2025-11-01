@@ -1,5 +1,20 @@
 /* Bootstrap overrides + consistencia visual base */
 
+/* Body global consistente */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif !important;
+  background-color: #f8f9fa !important;
+  color: var(--color-text-primary);
+  margin: 0;
+  padding: 0;
+}
+
 /* Botones de advertencia con la paleta del sistema */
 .btn-warning {
   background-color: var(--color-primary) !important;

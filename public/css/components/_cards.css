@@ -1,20 +1,20 @@
 /* Componente: Cards y tarjetas de estadísticas (migrado de admin/*.css) */
 
-/* Grid de estadísticas */
+/* Grid de estadísticas - uniforme en todas las páginas */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     align-items: stretch;
 }
 
-/* Base para tarjetas de estadísticas */
+/* Base para tarjetas de estadísticas - tamaño consistente */
 .stats-card,
 .create-btn {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.8rem 1.5rem;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
@@ -24,7 +24,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 160px;
+    min-height: 150px;
+    max-height: 150px;
+    height: 150px;
     border: 1px solid #f0f0f0;
 }
 
@@ -47,17 +49,17 @@
 }
 
 .stats-number {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: #333;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.4rem 0;
     line-height: 1;
 }
 
 .stats-label {
     color: var(--color-primary);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     margin: 0;
     line-height: 1.2;
 }
@@ -78,14 +80,14 @@
 }
 
 .create-btn i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
     display: block;
 }
 
 .create-text {
     line-height: 1.2;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 /* Tarjetas de estadísticas del reporte */
@@ -98,10 +100,15 @@
 .stat-card {
     background: var(--color-white);
     border-radius: 12px;
-    padding: 20px;
+    padding: 1.5rem;
     flex: 1;
     transition: all 0.2s ease;
     box-shadow: var(--shadow-sm);
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .stat-card:hover { 
@@ -111,7 +118,7 @@
 
 .stat-card h3 { 
     margin: 0 0 6px; 
-    font-size: 12px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--color-text-secondary);
     text-transform: uppercase;
@@ -121,7 +128,7 @@
 .stat-card p,
 .stat-card .stat-number { 
     margin: 0; 
-    font-size: 36px;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--color-text-primary);
 }
