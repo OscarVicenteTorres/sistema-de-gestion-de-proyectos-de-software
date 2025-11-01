@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro de Asistencia</title>
-    <link rel="stylesheet" href="<?php echo asset('css/admin/base.css'); ?>">
-    <link rel="stylesheet" href="<?php echo asset('css/desarrollador/Styles.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/Admin/Base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/Desarrollador/Asistencia.css'); ?>">
 </head>
 
 <body>
