@@ -1,7 +1,99 @@
-/* Sidebar compartido */
+/* Componente: Sidebar de navegación (extraído de admin/menu.css) */
 .sidebar {
-  width: 260px;
-  min-height: 100vh;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
+    width: 260px;
+    height: auto;
+    max-height: 450px;
+    background-color: var(--color-white);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    border-right: 1px solid var(--color-border);
+}
+
+.sidebar-header {
+    margin-bottom: 40px;
+}
+
+.sidebar-header h1, .sidebar-header h2 {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.sidebar-header h1 {
+    font-size: 24px;
+}
+.sidebar-header h2 {
+    font-size: 20px;
+}
+
+.sidebar-header p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    margin-bottom: 20px;
+}
+
+.sidebar-nav a {
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active {
+    color: var(--color-primary);
+    transform: translateX(5px);
+}
+
+.sidebar-nav i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-profile {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    margin: 0;
+}
+
+.user-role {
+    font-size: 12px;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin: 0;
+}
+
+.logout-icon {
+    color: var(--color-text-secondary);
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.logout-icon:hover {
+    color: var(--color-primary);
+    transform: rotate(10deg);
 }

@@ -1,0 +1,131 @@
+/* Página: Gestión de usuarios */
+
+.accounts-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.accounts-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+}
+
+.accounts-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.activos-section,
+.inactivos-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+/* Botones de acción circular */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #138496;
+    transform: scale(1.1);
+}
+
+.btn-view {
+    background: #28a745;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #218838;
+    transform: scale(1.1);
+}
+
+.btn-block {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-block:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.btn-activate {
+    background: #28a745;
+    color: white;
+}
+
+.btn-activate:hover {
+    background: #218838;
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .accounts-sections {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .accounts-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .accounts-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-header {
+        font-size: 1.2rem;
+    }
+    
+    .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .accounts-title {
+        font-size: 1.5rem;
+    }
+    
+    .btn-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+}

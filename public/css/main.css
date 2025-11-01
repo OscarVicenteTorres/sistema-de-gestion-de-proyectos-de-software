@@ -5,6 +5,14 @@
 @import url('components/_buttons.css');
 @import url('components/_cards.css');
 @import url('components/_sidebar.css');
+@import url('components/_tables.css');
+@import url('components/_forms.css');
+@import url('components/_modals.css');
 
 @import url('pages/_login.css');
 @import url('pages/_dashboard.css');
+@import url('pages/_tareas.css');
+@import url('pages/_usuarios.css');
+@import url('pages/_exportar.css');
+@import url('pages/_dash-desarrollador.css');
+@import url('pages/_asistencia.css');

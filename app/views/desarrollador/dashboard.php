@@ -12,9 +12,8 @@
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="<?= asset('css/admin/base.css'); ?>">
-    <link rel="stylesheet" href="<?= asset('css/desarrollador/Dash-Desarrollador.css'); ?>">
+    <!-- Single CSS entrypoint -->
+    <link rel="stylesheet" href="<?= asset('css/main.css'); ?>">
 </head>
 
 <body class="bg-light">

@@ -1,17 +1,272 @@
-/* Tarjetas y estadísticas */
+/* Componente: Cards y tarjetas de estadísticas (migrado de admin/*.css) */
+
+/* Grid de estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    align-items: stretch;
+}
+
+/* Base para tarjetas de estadísticas */
+.stats-card,
+.create-btn {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    border: 1px solid #f0f0f0;
+}
+
+.stats-card::before,
+.create-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--color-primary);
+}
+
+.stats-card:hover,
+.create-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+    line-height: 1;
+}
+
+.stats-label {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Botón de crear (estilo tarjeta) */
+.create-btn {
+    border: 2px dashed var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+    cursor: pointer;
+    background: white;
+}
+
+.create-btn:hover {
+    background: var(--color-primary);
+    color: white;
+    border: 2px solid var(--color-primary);
+}
+
+.create-btn i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.create-text {
+    line-height: 1.2;
+    font-size: 1rem;
+}
+
+/* Tarjetas de estadísticas del reporte */
 .stats {
   display: flex;
   gap: 15px;
   margin-bottom: 20px;
 }
+
 .stat-card {
-  background: var(--color-white);
-  border-radius: 12px;
-  padding: 20px;
-  flex: 1;
-  transition: transform 0.2s ease;
-  box-shadow: var(--shadow-sm);
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
-.stat-card:hover { transform: translateY(-2px); }
-.stat-card h3 { margin: 0 0 6px; font-weight: 700; color: var(--color-dark); }
-.stat-card p { margin: 0; color: var(--color-text-secondary); }
+
+.stat-card:hover { 
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 { 
+    margin: 0 0 6px; 
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-card p,
+.stat-card .stat-number { 
+    margin: 0; 
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+/* Tarjetas de usuario */
+.user-item {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.user-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.user-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Tarjetas de equipo */
+.team-members {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.team-member {
+    background-color: #fefce8;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.team-member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.team-member-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.team-member-role {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-white);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* Tarjetas de exportar */
+.card {
+    flex: 1;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.card.total { background-color: #007bff; }
+.card.activos { background-color: #28a745; }
+.card.completados { background-color: #ffc107; }
+
+/* Responsive */
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .stats-card,
+    .create-btn {
+        min-height: 140px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stats-card,
+    .create-btn {
+        min-height: 120px;
+        padding: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .stats-label,
+    .create-text {
+        font-size: 0.9rem;
+    }
+    
+    .create-btn i {
+        font-size: 1.8rem;
+    }
+    
+    .user-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-number {
+        font-size: 1.75rem;
+    }
+    
+    .user-info h4 {
+        font-size: 0.9rem;
+    }
+    
+    .user-info p {
+        font-size: 0.75rem;
+    }
+}

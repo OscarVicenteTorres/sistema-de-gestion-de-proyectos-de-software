@@ -1,3 +1,101 @@
-/* Layout general de dashboard (compartido) */
-.dashboard-container { display: flex; min-height: 100vh; background: #f8f9fa; }
-.main-content { flex: 1; padding: 24px 48px; }
+/* Layout general de dashboard (compartido para admin y desarrollador) */
+.dashboard-container { 
+    display: flex; 
+    min-height: 100vh; 
+    background: #f8f9fa; 
+}
+
+.main-content { 
+    flex: 1; 
+    padding: 24px 48px; 
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.section-title {
+    color: var(--color-primary);
+    font-size: 28px;
+    margin-bottom: 24px;
+    font-weight: 600;
+}
+
+.projects-section {
+    margin-top: 20px;
+}
+
+/* Efecto de aparición del dashboard */
+body {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInDashboard 0.8s ease-out forwards;
+}
+
+@keyframes fadeInDashboard {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bootstrap utilities y overrides específicos de dashboard */
+.bg-purple {
+    background-color: #8b5cf6 !important;
+}
+
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .main-content {
+        padding: 20px 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .main-content {
+        padding: 16px 20px;
+    }
+    
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

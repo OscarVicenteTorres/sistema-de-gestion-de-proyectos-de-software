@@ -1,0 +1,151 @@
+/* Componente: Tablas (extraído de admin/*.css) */
+
+.projects-table-container,
+.projects-section .projects-table-container {
+    background-color: var(--color-white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.projects-table,
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.projects-table th, 
+.projects-table td,
+.table th,
+.table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.projects-table thead,
+.table-dark {
+    background-color: var(--color-dark) !important;
+}
+
+.projects-table th,
+.table-dark th {
+    color: var(--color-primary) !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.projects-table tbody tr,
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.projects-table tbody tr:hover,
+.table-hover tbody tr:hover {
+    background-color: #fefce8;
+}
+
+.projects-table tbody tr:last-child td,
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.projects-table td,
+.table td {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.projects-table td:first-child,
+.table td:first-child {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* Tabla de proyectos exportar */
+.tabla-proyectos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-proyectos th, 
+.tabla-proyectos td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.tabla-proyectos thead {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+}
+
+/* Barra de progreso en tablas */
+.progress {
+    height: 20px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: var(--color-primary) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark);
+    font-weight: 600;
+    transition: width 0.3s ease;
+}
+
+.progress-bar.bg-warning {
+    background-color: var(--color-primary) !important;
+}
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 150px;
+}
+
+.progress-bar-container span {
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 14px;
+}
+
+/* Acciones de tabla */
+.actions {
+    display: flex;
+    gap: 20px;
+    font-size: 16px;
+}
+
+.actions i {
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all 0.3s ease;
+}
+
+.actions i:hover {
+    color: var(--color-primary);
+    transform: scale(1.2);
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-group .action-icon {
+    transition: all 0.3s ease;
+}
+
+.btn-group .action-icon:hover {
+    transform: translateY(-2px);
+}
