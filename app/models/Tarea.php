@@ -8,24 +8,21 @@ require_once __DIR__ . "/../config/database.php";
  * Incluye CRUD completo, validaciones y métodos específicos para gestión administrativa.
  * Cada método retorna arrays asociativos que pueden ser convertidos fácilmente a JSON.
  */
-class Tarea
-{
+class Tarea {
     private $conn;
-
+    
     // Constantes para las áreas permitidas (solo 3 como especificó el cliente)
     const AREAS_PERMITIDAS = ['Frontend', 'Backend', 'Infraestructura'];
     const ESTADOS_PERMITIDOS = ['Pendiente', 'En Progreso', 'Completado', 'Pausado', 'Cancelado'];
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->conn = Database::connect();
     }
 
-
-    // Obtiene todas las tareas para el dashboard del administrador en la pagina de gestión de tareas
-
-    public function obtenerTodas($filtros = [])
-    {
+  
+// Obtiene todas las tareas para el dashboard del administrador en la pagina de gestión de tareas
+     
+    public function obtenerTodas($filtros = []) {
         $sql = "SELECT 
                     t.id_tarea,
                     t.titulo,
@@ -60,40 +57,69 @@ class Tarea
                 FROM tareas t
                 INNER JOIN proyectos p ON t.id_proyecto = p.id_proyecto
                 INNER JOIN usuarios u ON t.id_usuario = u.id_usuario";
-
+        
         // Aplicar filtros dinámicamente
         $condiciones = [];
         $parametros = [];
-
+        
         if (!empty($filtros['proyecto_id'])) {
             $condiciones[] = "t.id_proyecto = :proyecto_id";
             $parametros[':proyecto_id'] = $filtros['proyecto_id'];
         }
-
+        
         if (!empty($filtros['area'])) {
             $condiciones[] = "t.area_asignada = :area";
             $parametros[':area'] = $filtros['area'];
         }
-
+        
         if (!empty($filtros['estado'])) {
             $condiciones[] = "t.estado = :estado";
             $parametros[':estado'] = $filtros['estado'];
         }
-
+        
         if (!empty($filtros['usuario_id'])) {
             $condiciones[] = "t.id_usuario = :usuario_id";
             $parametros[':usuario_id'] = $filtros['usuario_id'];
         }
 
+        // Filtros adicionales: búsqueda por título/descripcion y rangos de fecha
+        if (!empty($filtros['titulo_like'])) {
+            $condiciones[] = "t.titulo LIKE :titulo_like";
+            $parametros[':titulo_like'] = '%' . $filtros['titulo_like'] . '%';
+        }
+
+        if (!empty($filtros['descripcion_like'])) {
+            $condiciones[] = "t.descripcion LIKE :descripcion_like";
+            $parametros[':descripcion_like'] = '%' . $filtros['descripcion_like'] . '%';
+        }
+
+        if (!empty($filtros['fecha_creacion_from'])) {
+            $condiciones[] = "t.fecha_creacion >= :fecha_creacion_from";
+            $parametros[':fecha_creacion_from'] = $filtros['fecha_creacion_from'];
+        }
+        if (!empty($filtros['fecha_creacion_to'])) {
+            $condiciones[] = "t.fecha_creacion <= :fecha_creacion_to";
+            $parametros[':fecha_creacion_to'] = $filtros['fecha_creacion_to'];
+        }
+
+        if (!empty($filtros['fecha_limite_from'])) {
+            $condiciones[] = "t.fecha_limite >= :fecha_limite_from";
+            $parametros[':fecha_limite_from'] = $filtros['fecha_limite_from'];
+        }
+        if (!empty($filtros['fecha_limite_to'])) {
+            $condiciones[] = "t.fecha_limite <= :fecha_limite_to";
+            $parametros[':fecha_limite_to'] = $filtros['fecha_limite_to'];
+        }
+        
         if (!empty($condiciones)) {
             $sql .= " WHERE " . implode(" AND ", $condiciones);
         }
-
+        
         $sql .= " ORDER BY t.fecha_limite ASC, t.fecha_creacion DESC";
-
+        
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($parametros);
-
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -103,8 +129,7 @@ class Tarea
      * @param int $id - ID de la tarea
      * @return array|false - Datos de la tarea o false si no existe
      */
-    public function obtenerPorId($id)
-    {
+    public function obtenerPorId($id) {
         $sql = "SELECT 
                     t.*,
                     p.nombre as proyecto_nombre,
@@ -114,11 +139,11 @@ class Tarea
                 INNER JOIN proyectos p ON t.id_proyecto = p.id_proyecto
                 INNER JOIN usuarios u ON t.id_usuario = u.id_usuario
                 WHERE t.id_tarea = :id";
-
+        
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-
+        
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -129,14 +154,13 @@ class Tarea
      * @param array $datos - Datos de la tarea
      * @return array - ['exito' => bool, 'mensaje' => string, 'id' => int|null]
      */
-    public function crear($datos)
-    {
+    public function crear($datos) {
         // Validaciones básicas
         $validacion = $this->validarDatos($datos);
         if (!$validacion['exito']) {
             return $validacion;
         }
-
+        
         try {
             $sql = "INSERT INTO tareas (
                         id_proyecto,
@@ -159,9 +183,9 @@ class Tarea
                         :estado,
                         :porcentaje_avance
                     )";
-
+            
             $stmt = $this->conn->prepare($sql);
-
+            
             // Preparar parámetros con valores por defecto
             $params = [
                 ':id_proyecto' => $datos['id_proyecto'],
@@ -174,9 +198,9 @@ class Tarea
                 ':estado' => $datos['estado'] ?? 'Pendiente',
                 ':porcentaje_avance' => $datos['porcentaje_avance'] ?? 0
             ];
-
+            
             $resultado = $stmt->execute($params);
-
+            
             if ($resultado) {
                 $id_tarea = $this->conn->lastInsertId();
                 return [
@@ -190,6 +214,7 @@ class Tarea
                     'mensaje' => 'Error al crear la tarea'
                 ];
             }
+            
         } catch (PDOException $e) {
             error_log("Error al crear tarea: " . $e->getMessage());
             return [
@@ -206,35 +231,36 @@ class Tarea
      * @param array $datos - Nuevos datos
      * @return array - ['exito' => bool, 'mensaje' => string]
      */
-    public function actualizar($id, $datos)
-    {
+    public function actualizar($id, $datos) {
         // Verificar que la tarea existe
         if (!$this->obtenerPorId($id)) {
             return ['exito' => false, 'mensaje' => 'La tarea no existe'];
         }
-
+        
         // Validar datos
         $validacion = $this->validarDatos($datos, false); // false = no es creación
         if (!$validacion['exito']) {
             return $validacion;
         }
-
+        
         try {
             $sql = "UPDATE tareas SET 
                         titulo = :titulo,
                         descripcion = :descripcion,
+                        id_usuario = :id_usuario,
                         area_asignada = :area_asignada,
                         fecha_inicio = :fecha_inicio,
                         fecha_limite = :fecha_limite,
                         estado = :estado,
                         porcentaje_avance = :porcentaje_avance
                     WHERE id_tarea = :id";
-
+            
             $stmt = $this->conn->prepare($sql);
-
+            
             $params = [
                 ':titulo' => $datos['titulo'],
                 ':descripcion' => $datos['descripcion'] ?? '',
+                ':id_usuario' => $datos['id_usuario'],
                 ':area_asignada' => $datos['area_asignada'],
                 ':fecha_inicio' => $datos['fecha_inicio'],
                 ':fecha_limite' => $datos['fecha_limite'],
@@ -242,25 +268,14 @@ class Tarea
                 ':porcentaje_avance' => $datos['porcentaje_avance'] ?? 0,
                 ':id' => $id
             ];
-
+            
             $resultado = $stmt->execute($params);
-
-            if ($resultado) {
-                // Actualizar avance del proyecto automáticamente
-                require_once __DIR__ . "/Proyecto.php";
-                $proyectoModel = new Proyecto();
-
-                // Obtener el ID del proyecto relacionado
-                $tarea = $this->obtenerPorId($id);
-                if ($tarea && isset($tarea['id_proyecto'])) {
-                    $proyectoModel->actualizarProgreso($tarea['id_proyecto']);
-                }
-            }
-
+            
             return [
                 'exito' => $resultado,
                 'mensaje' => $resultado ? 'Tarea actualizada exitosamente' : 'Error al actualizar la tarea'
             ];
+            
         } catch (PDOException $e) {
             error_log("Error al actualizar tarea: " . $e->getMessage());
             return ['exito' => false, 'mensaje' => 'Error interno del servidor'];
@@ -273,31 +288,31 @@ class Tarea
      * @param int $id - ID de la tarea
      * @return array - ['exito' => bool, 'mensaje' => string]
      */
-    public function eliminar($id)
-    {
+    public function eliminar($id) {
         // Verificar que la tarea existe
         $tarea = $this->obtenerPorId($id);
         if (!$tarea) {
             return ['exito' => false, 'mensaje' => 'La tarea no existe'];
         }
-
+        
         try {
             // Eliminar justificaciones asociadas primero
             $sqlJustificaciones = "DELETE FROM justificaciones_tareas WHERE id_tarea = :id";
             $stmtJust = $this->conn->prepare($sqlJustificaciones);
             $stmtJust->bindParam(':id', $id, PDO::PARAM_INT);
             $stmtJust->execute();
-
+            
             // Eliminar la tarea
             $sql = "DELETE FROM tareas WHERE id_tarea = :id";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $resultado = $stmt->execute();
-
+            
             return [
                 'exito' => $resultado,
                 'mensaje' => $resultado ? 'Tarea eliminada exitosamente' : 'Error al eliminar la tarea'
             ];
+            
         } catch (PDOException $e) {
             error_log("Error al eliminar tarea: " . $e->getMessage());
             return ['exito' => false, 'mensaje' => 'Error interno del servidor'];
@@ -309,8 +324,7 @@ class Tarea
      * 
      * @return array - Estadísticas completas
      */
-    public function obtenerEstadisticas()
-    {
+    public function obtenerEstadisticas($proyectoId = null) {
         try {
             $sql = "SELECT 
                         COUNT(*) as total_tareas,
@@ -333,12 +347,17 @@ class Tarea
                         -- Progreso promedio
                         AVG(porcentaje_avance) as progreso_promedio
                         
-                    FROM tareas";
-
+                    FROM tareas t";
+            $params = [];
+            if (!empty($proyectoId) && is_numeric($proyectoId)) {
+                $sql .= " WHERE t.id_proyecto = :proyecto_id";
+                $params[':proyecto_id'] = $proyectoId;
+            }
+            
             $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
+            $stmt->execute($params);
             $stats = $stmt->fetch(PDO::FETCH_ASSOC);
-
+            
             // Calcular porcentajes
             $total = $stats['total_tareas'];
             if ($total > 0) {
@@ -350,10 +369,11 @@ class Tarea
                 $stats['porcentaje_en_progreso'] = 0;
                 $stats['porcentaje_pendientes'] = 0;
             }
-
+            
             $stats['progreso_promedio'] = round($stats['progreso_promedio'], 2);
-
+            
             return $stats;
+            
         } catch (PDOException $e) {
             error_log("Error al obtener estadísticas: " . $e->getMessage());
             return [];
@@ -367,23 +387,22 @@ class Tarea
      * @param bool $esCreacion - true si es creación, false si es actualización
      * @return array - ['exito' => bool, 'mensaje' => string]
      */
-    private function validarDatos($datos, $esCreacion = true)
-    {
+    private function validarDatos($datos, $esCreacion = true) {
         // Título requerido
         if (empty($datos['titulo']) || strlen(trim($datos['titulo'])) < 3) {
             return ['exito' => false, 'mensaje' => 'El título es requerido y debe tener al menos 3 caracteres'];
         }
-
+        
         // Área válida
         if (empty($datos['area_asignada']) || !in_array($datos['area_asignada'], self::AREAS_PERMITIDAS)) {
             return ['exito' => false, 'mensaje' => 'El área asignada debe ser: Frontend, Backend o Infraestructura'];
         }
-
+        
         // Estado válido
         if (!empty($datos['estado']) && !in_array($datos['estado'], self::ESTADOS_PERMITIDOS)) {
             return ['exito' => false, 'mensaje' => 'Estado no válido'];
         }
-
+        
         // Porcentaje válido
         if (isset($datos['porcentaje_avance'])) {
             $porcentaje = (int)$datos['porcentaje_avance'];
@@ -391,28 +410,27 @@ class Tarea
                 return ['exito' => false, 'mensaje' => 'El porcentaje debe estar entre 0 y 100'];
             }
         }
-
+        
         // Fechas válidas
         if (!empty($datos['fecha_limite'])) {
             if (!$this->validarFecha($datos['fecha_limite'])) {
                 return ['exito' => false, 'mensaje' => 'Formato de fecha límite inválido'];
             }
         }
-
+        
         if (!empty($datos['fecha_inicio'])) {
             if (!$this->validarFecha($datos['fecha_inicio'])) {
                 return ['exito' => false, 'mensaje' => 'Formato de fecha de inicio inválido'];
             }
         }
-
+        
         return ['exito' => true, 'mensaje' => 'Datos válidos'];
     }
-
+    
     /**
      * Validar formato de fecha
      */
-    private function validarFecha($fecha)
-    {
+    private function validarFecha($fecha) {
         $d = DateTime::createFromFormat('Y-m-d', $fecha);
         return $d && $d->format('Y-m-d') === $fecha;
     }
@@ -422,36 +440,10 @@ class Tarea
      * 
      * @return array - Arrays con opciones para selects
      */
-    public function obtenerOpcionesFormulario()
-    {
+    public function obtenerOpcionesFormulario() {
         return [
             'areas' => self::AREAS_PERMITIDAS,
             'estados' => self::ESTADOS_PERMITIDOS
         ];
-    }
-
-    public function obtenerTareasPorProyecto($id_proyecto)
-    {
-        $sql = "SELECT 
-                t.id_tarea,
-                t.titulo,
-                t.descripcion,
-                t.estado,
-                t.porcentaje_avance,
-                t.fecha_inicio,
-                t.fecha_limite,
-                t.area_asignada,
-                u.nombre AS usuario_nombre,
-                u.apellido AS usuario_apellido
-            FROM tareas t
-            INNER JOIN usuarios u ON t.id_usuario = u.id_usuario
-            WHERE t.id_proyecto = :id_proyecto
-            ORDER BY t.fecha_limite ASC";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':id_proyecto', $id_proyecto, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

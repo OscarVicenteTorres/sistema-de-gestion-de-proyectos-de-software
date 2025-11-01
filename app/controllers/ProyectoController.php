@@ -128,6 +128,24 @@ class ProyectoController extends Controller
     }
 
     /**
+     * NUEVA FUNCIÓN: Obtener estadísticas de proyectos en formato JSON
+     */
+    public function estadisticasAjax()
+    {
+        AuthMiddleware::verificarSesion();
+        $proyectoModel = new Proyecto();
+        $estadisticas = $proyectoModel->obtenerEstadisticas();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'estadisticas' => $estadisticas
+        ]);
+        exit;
+    }
+
+
+    /**
      * Obtener detalles de un proyecto
      */
     public function obtenerDetalles()

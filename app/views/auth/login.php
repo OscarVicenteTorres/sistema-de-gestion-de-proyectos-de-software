@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
-    <!-- Enlace al CSS de inicio -->
     <link rel="stylesheet" href="<?php echo asset('css/inicio/login.css'); ?>">
 </head>
 
@@ -64,7 +63,7 @@
 
                 // Enviar el formulario real luego de la animación
                 setTimeout(() => {
-                    form.submit(); // 🔁 Esto sí manda los datos al servidor
+                    form.submit(); 
                 }, 2000);
             });
         });

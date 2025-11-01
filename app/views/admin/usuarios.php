@@ -220,16 +220,15 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="correo">Correo *</label>
-                        <input type="email" id="correo" name="correo" placeholder="usuario@ejemplo.com" 
-                               required maxlength="100"
-                               pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                               title="Ingrese un correo válido">
+               <input type="email" id="correo" name="correo" placeholder="usuario@ejemplo.com"
+                   required maxlength="100"
+                   title="Ingrese un correo válido">
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321" 
-                               minlength="7" maxlength="15" pattern="[0-9+\s()-]+"
-                               title="Solo números y símbolos telefónicos">
+               <input type="tel" id="telefono" name="telefono" placeholder="Ej: 987654321"
+                   minlength="7" maxlength="15"
+                   title="Solo números y símbolos telefónicos">
                     </div>
                 </div>
                 <div class="form-row">
@@ -240,7 +239,6 @@
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
                             <option value="Fullstack">Fullstack</option>
-                            <option value="UI/UX">UI/UX</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -358,16 +356,15 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="edit-correo">Correo *</label>
-                        <input type="email" id="edit-correo" name="correo" 
-                               required maxlength="100"
-                               pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                               title="Ingrese un correo válido">
+               <input type="email" id="edit-correo" name="correo"
+                   required maxlength="100"
+                   title="Ingrese un correo válido">
                     </div>
                     <div class="form-group">
                         <label for="edit-telefono">Teléfono</label>
-                        <input type="tel" id="edit-telefono" name="telefono" 
-                               minlength="7" maxlength="15" pattern="[0-9+\s()-]+"
-                               title="Solo números y símbolos telefónicos">
+               <input type="tel" id="edit-telefono" name="telefono" 
+                   minlength="7" maxlength="15"
+                   title="Solo números y símbolos telefónicos">
                     </div>
                 </div>
                 <div class="form-row">
@@ -377,7 +374,7 @@
                             <option value="Frontend">Frontend</option>
                             <option value="Backend">Backend</option>
                             <option value="Fullstack">Fullstack</option>
-                            <option value="UI/UX">UI/UX</option>
+                            <!-- <option value="UI/UX">UI/UX</option> -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -427,7 +424,7 @@
             <h2>¿Realmente quieres eliminar?</h2>
             <p>Esta acción no se puede deshacer.<br>Los datos eliminados se perderán permanentemente.</p>
             <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-                <button class="btn btn-outline" onclick="closeModal()" style="padding: 0.75rem 1.5rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">Cancelar</button>
+                <button class="btn btn-outline close-modal-btn" style="padding: 0.75rem 1.5rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">Cancelar</button>
                 <button class="btn btn-primary" id="confirm-block-btn" style="padding: 0.75rem 1.5rem; background: #d4a017; color: white; border: none; border-radius: 4px; cursor: pointer;">confirmar</button>
             </div>
         </div>
@@ -479,271 +476,6 @@
 
     <!-- Bootstrap 5 Bundle JS (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Reutilizar funciones del dashboard para modales
-        const modalOverlay = document.getElementById('modal-overlay');
-        
-        function openModal(modalId) {
-            modalOverlay.classList.add('active');
-            document.getElementById(modalId).classList.add('active');
-        }
-        
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.classList.remove('active');
-            });
-        }
-
-        function openCreateModal() {
-            openModal('create-modal');
-        }
-
-        function showSuccess(title, message) {
-            document.getElementById('success-title').textContent = title;
-            document.getElementById('success-message').textContent = message;
-            openModal('success-modal');
-            setTimeout(closeModal, 2000);
-        }
-
-        function showError(title, message) {
-            document.getElementById('error-title').textContent = title;
-            document.getElementById('error-message').textContent = message;
-            openModal('error-modal');
-            setTimeout(closeModal, 3000);
-        }
-
-        // Variables globales
-        let currentUserId = null;
-
-        // Funciones de gestión de usuarios
-        function editUser(id) {
-            currentUserId = id;
-            
-            // Cargar datos del usuario para editar
-            fetch(`?c=Usuario&a=obtenerDetalles&id=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const user = data.usuario;
-                        
-                        // Llenar el formulario de edición
-                        document.getElementById('edit-id').value = user.id_usuario || user.id;
-                        document.getElementById('edit-nombres').value = user.nombre || user.nombres || '';
-                        document.getElementById('edit-apellidos').value = user.apellido || user.apellidos || '';
-                        document.getElementById('edit-documento').value = user.documento || '';
-                        document.getElementById('edit-tipo-documento').value = user.tipo_documento || 'DNI';
-                        document.getElementById('edit-correo').value = user.correo || user.email || '';
-                        document.getElementById('edit-telefono').value = user.telefono || '';
-                        document.getElementById('edit-area-trabajo').value = user.area_trabajo || 'Frontend';
-                        document.getElementById('edit-fecha-inicio').value = user.fecha_inicio || '';
-                        document.getElementById('edit-tecnologias').value = user.tecnologias || '';
-                        document.getElementById('edit-rol').value = user.rol || user.rol_nombre || 'Desarrollador';
-                        
-                        // Limpiar campos de contraseña
-                        document.getElementById('edit-contrasena').value = '';
-                        document.getElementById('edit-confirmar-contrasena').value = '';
-                        
-                        openModal('edit-modal');
-                    } else {
-                        showError('Error', 'No se pudieron cargar los datos del usuario');
-                    }
-                })
-                .catch(error => {
-                    showError('Error', 'Error de conexión al cargar datos');
-                });
-        }
-
-        function viewUser(id) {
-            // Cargar datos del usuario para mostrar
-            fetch(`?c=Usuario&a=obtenerDetalles&id=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const user = data.usuario;
-                        
-                        // Mostrar datos en el modal de detalles
-                        document.getElementById('view-nombre').textContent = 
-                            `${user.nombre || user.nombres || ''} ${user.apellido || user.apellidos || ''}`.trim();
-                        document.getElementById('view-documento').textContent = user.documento || 'No especificado';
-                        document.getElementById('view-correo').textContent = user.correo || user.email || 'No especificado';
-                        document.getElementById('view-telefono').textContent = user.telefono || 'No especificado';
-                        document.getElementById('view-area').textContent = user.area_trabajo || 'Frontend';
-                        document.getElementById('view-password').textContent = '••••••••'; // Por seguridad
-                        document.getElementById('view-tecnologias').textContent = user.tecnologias || 'Vue, CSS';
-                        
-                        openModal('view-modal');
-                    } else {
-                        showError('Error', 'No se pudieron cargar los datos del usuario');
-                    }
-                })
-                .catch(error => {
-                    showError('Error', 'Error de conexión al cargar datos');
-                });
-        }
-
-        function blockUser(id) {
-            currentUserId = id;
-            openModal('block-confirmation-modal');
-        }
-
-        // Confirmar bloqueo
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('confirm-block-btn')?.addEventListener('click', function() {
-                if (currentUserId) {
-                    closeModal();
-                    
-                    fetch(`?c=Usuario&a=bloquear&id=${currentUserId}`, {
-                        method: 'POST'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            openModal('block-success-modal');
-                            setTimeout(() => {
-                                closeModal();
-                                location.reload();
-                            }, 2000);
-                        } else {
-                            showError('Error', data.message || 'No se pudo bloquear la cuenta');
-                        }
-                    })
-                    .catch(error => {
-                        showError('Error', 'Error de conexión');
-                    });
-                }
-            });
-        });
-
-        function activateUser(id) {
-            fetch(`?c=Usuario&a=activar&id=${id}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    openModal('activate-success-modal');
-                    setTimeout(() => {
-                        closeModal();
-                        location.reload();
-                    }, 2000);
-                } else {
-                    showError('Error', data.message || 'No se pudo activar la cuenta');
-                }
-            })
-            .catch(error => {
-                showError('Error', 'Error de conexión');
-            });
-        }
-
-        function deleteUser(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar definitivamente esta cuenta? Esta acción no se puede deshacer.')) {
-                fetch(`?c=Usuario&a=eliminar&id=${id}`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccess('¡Cuenta Eliminada!', 'La cuenta ha sido eliminada permanentemente.');
-                        setTimeout(() => location.reload(), 2000);
-                    } else {
-                        showError('Error', data.message || 'No se pudo eliminar la cuenta');
-                    }
-                })
-                .catch(error => {
-                    showError('Error', 'Error de conexión');
-                });
-            }
-        }
-
-        // Manejo del formulario de creación
-        document.getElementById('create-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            // Validar que las contraseñas coincidan
-            const password = formData.get('contrasena');
-            const confirmPassword = formData.get('confirmar_contrasena');
-            
-            if (password !== confirmPassword) {
-                showError('Error', 'Las contraseñas no coinciden');
-                return;
-            }
-            
-            fetch('?c=Usuario&a=crear', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    closeModal();
-                    showSuccess('¡Usuario Creado!', 'El usuario ha sido creado exitosamente.');
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    showError('Error', data.message || 'No se pudo crear el usuario');
-                }
-            })
-            .catch(error => {
-                showError('Error', 'Error de conexión');
-            });
-        });
-
-        // Manejo del formulario de edición
-        document.getElementById('edit-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            // Validar contraseñas si se proporcionaron
-            const password = formData.get('contrasena');
-            const confirmPassword = formData.get('confirmar_contrasena');
-            
-            if (password && password !== confirmPassword) {
-                showError('Error', 'Las contraseñas no coinciden');
-                return;
-            }
-            
-            // Si no hay contraseña nueva, eliminar los campos del FormData
-            if (!password) {
-                formData.delete('contrasena');
-                formData.delete('confirmar_contrasena');
-            }
-            
-            fetch('?c=Usuario&a=actualizar', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    closeModal();
-                    showSuccess('¡Usuario Actualizado!', 'Los datos del usuario han sido actualizados exitosamente.');
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    showError('Error', data.message || 'No se pudo actualizar el usuario');
-                }
-            })
-            .catch(error => {
-                showError('Error', 'Error de conexión');
-            });
-        });
-
-        // Event listeners para cerrar modales
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('close-modal-btn') || e.target.classList.contains('modal-overlay')) {
-                closeModal();
-            }
-        });
-
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
+    <script src="<?php echo asset('js/usuarios.js'); ?>"></script>
 </body>
 </html>

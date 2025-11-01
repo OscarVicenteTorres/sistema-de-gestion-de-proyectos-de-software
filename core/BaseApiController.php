@@ -31,6 +31,31 @@ abstract class BaseApiController extends Controller {
 
     // Envía respuesta JSON y termina ejecución
     private function jsonResponse(array $data): void {
+        // Compatibilidad: duplicar claves en inglés para clientes antiguos
+        if (isset($data['exito']) && !isset($data['success'])) {
+            $data['success'] = $data['exito'];
+        }
+        if (isset($data['mensaje']) && !isset($data['message'])) {
+            $data['message'] = $data['mensaje'];
+        }
+        if (isset($data['datos']) && !isset($data['data'])) {
+            $data['data'] = $data['datos'];
+        }
+
+        // Si dentro de datos viene 'usuario' o 'usuarios', exponerlos también al toplevel
+        if (isset($data['datos']) && is_array($data['datos'])) {
+            if (isset($data['datos']['usuario']) && !isset($data['usuario'])) {
+                $data['usuario'] = $data['datos']['usuario'];
+            }
+            if (isset($data['datos']['usuarios']) && !isset($data['usuarios'])) {
+                $data['usuarios'] = $data['datos']['usuarios'];
+            }
+            // Si datos es una lista (listar), exponerla como 'usuarios' para compatibilidad
+            if (array_values($data['datos']) === $data['datos'] && !isset($data['usuarios'])) {
+                $data['usuarios'] = $data['datos'];
+            }
+        }
+
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
@@ -38,12 +63,22 @@ abstract class BaseApiController extends Controller {
 
     // Obtiene y valida entrada JSON del request
     protected function getJsonInput(): array {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
+        // Sólo intentar parsear JSON si el Content-Type indica JSON.
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+        if (stripos($contentType, 'application/json') === false) {
+            return [];
+        }
+
+        $raw = file_get_contents('php://input');
+        if (empty($raw)) {
+            return [];
+        }
+
+        $input = json_decode($raw, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->jsonError('Formato JSON inválido', ['error' => json_last_error_msg()]);
         }
-        
+
         return $input ?: [];
     }
 
