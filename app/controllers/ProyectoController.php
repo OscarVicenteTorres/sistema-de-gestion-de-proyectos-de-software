@@ -3,11 +3,14 @@ require_once __DIR__ . '/../../core/Controller.php';
 require_once __DIR__ . '/../models/Proyecto.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
-class ProyectoController extends Controller {
+class ProyectoController extends Controller
+{
+    private $db;
     /**
      * Listar todos los proyectos en formato JSON (para AJAX)
      */
-    public function listarAjax() {
+    public function listarAjax()
+    {
         AuthMiddleware::verificarSesion();
         $proyectoModel = new Proyecto();
         $proyectos = $proyectoModel->obtenerTodosConEncargados();
@@ -15,7 +18,7 @@ class ProyectoController extends Controller {
         echo json_encode($proyectos);
         exit;
     }
-    
+
     /**
      * Ver todos los proyectos (lista)
      */
@@ -125,6 +128,24 @@ class ProyectoController extends Controller {
     }
 
     /**
+     * NUEVA FUNCIÓN: Obtener estadísticas de proyectos en formato JSON
+     */
+    public function estadisticasAjax()
+    {
+        AuthMiddleware::verificarSesion();
+        $proyectoModel = new Proyecto();
+        $estadisticas = $proyectoModel->obtenerEstadisticas();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'estadisticas' => $estadisticas
+        ]);
+        exit;
+    }
+
+
+    /**
      * Obtener detalles de un proyecto
      */
     public function obtenerDetalles()
@@ -181,4 +202,52 @@ class ProyectoController extends Controller {
         ]);
     }
 
+    public function obtenerProyectosPorUsuario($id_usuario)
+    {
+        $sql = "SELECT 
+                p.id_proyecto,
+                p.nombre,
+                p.descripcion,
+                p.fecha_inicio,
+                p.fecha_fin,
+                p.estado,
+                p.area AS categoria,
+                p.porcentaje_avance
+            FROM proyectos p
+            INNER JOIN tareas t ON p.id_proyecto = t.id_proyecto
+            WHERE t.id_usuario = :id_usuario
+            GROUP BY p.id_proyecto
+            ORDER BY p.fecha_inicio DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    public function dashboard()
+    {
+        session_start();
+        $usuarioId = $_SESSION['usuario']['id_usuario'] ?? null;
+
+        if (!$usuarioId) {
+            header('Location: index.php?c=Auth&a=login');
+            exit;
+        }
+
+        $proyectoModel = new Proyecto();
+        $tareaModel = new Tarea();
+
+        // Obtener proyectos asignados al usuario
+        $proyectos = $proyectoModel->obtenerProyectosPorUsuario($usuarioId);
+
+        // Obtener tareas de cada proyecto
+        foreach ($proyectos as &$proyecto) {
+            $proyecto['tareas'] = $tareaModel->obtenerTareasPorProyecto($proyecto['id_proyecto']);
+        }
+
+        include __DIR__ . '/../views/desarrollador/dashboard.php';
+    }
 }

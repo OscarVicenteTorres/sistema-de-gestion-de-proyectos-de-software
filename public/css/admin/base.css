@@ -65,3 +65,16 @@ body {
 .btn-outline:hover {
     background-color: #f1f5f9;
 }
+
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa; 
+}
+
+.main-content {
+    flex-grow: 1; 
+    padding: 24px 48px;
+    width: 100%;
+}

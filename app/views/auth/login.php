@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Inicio de Sesión</title>
-    <!-- Enlace al CSS de inicio -->
     <link rel="stylesheet" href="<?php echo asset('css/inicio/login.css'); ?>">
 </head>
 
@@ -17,7 +16,7 @@
         <section class="login-section">
             <div class="login-card">
                 <div class="logo-area">
-                    <img src="<?php echo asset('img/logoecd6bb9674-e1726685420875.png'); ?>" alt="GRUVITEC" class="logo-neon">
+                    <img src="<?php echo asset('img/logoemp.png'); ?>" alt="GRUVITEC" class="logo-neon">
                     <h1>SOFTWARE DE GESTIÓN DE PROYECTOS</h1>
                     <p>Grupo Vicente Inversiones E.I.R.L.</p>
                 </div>
@@ -47,7 +46,7 @@
     </div>
 
     <div id="transition-screen" class="transition-screen">
-        <img src="public/img/logoecd6bb9674-e1726685420875.png" alt="GRUVITEC" class="transition-logo">
+        <img src="<?php echo asset('img/logoemp.png'); ?>" alt="GRUVITEC" class="logo-neon">
     </div>
 
     <script>
@@ -64,7 +63,7 @@
 
                 // Enviar el formulario real luego de la animación
                 setTimeout(() => {
-                    form.submit(); // 🔁 Esto sí manda los datos al servidor
+                    form.submit(); 
                 }, 2000);
             });
         });

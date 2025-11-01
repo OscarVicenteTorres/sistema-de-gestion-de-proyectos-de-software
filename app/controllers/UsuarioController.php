@@ -1,508 +1,176 @@
 <?php
-require_once __DIR__ . '/../../core/Controller.php';
-require_once __DIR__ . '/../models/Proyecto.php';
+require_once __DIR__ . '/../../core/BaseApiController.php';
 require_once __DIR__ . '/../models/Usuario.php';
-require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+require_once __DIR__ . '/../models/Proyecto.php'; // Necesario para los dashboards
 
-class UsuarioController extends Controller {
+class UsuarioController extends BaseApiController {
 
-    public function index() {
-        // Verificar que solo admins puedan ver usuarios
-        AuthMiddleware::verificarRol(['Admin']);
-        
-        try {
-            $usuarioModel = new Usuario();
-            $usuarios = $usuarioModel->obtenerTodos();
-            
-            // Renderiza la vista usuarios.php con los datos
-            $this->render('admin/usuarios', ['usuarios' => $usuarios]);
-        } catch (Exception $e) {
-            // En caso de error, renderizar con array vacío
-            $this->render('admin/usuarios', ['usuarios' => []]);
-        }
+    private Usuario $usuarioModel;
+
+    public function __construct() {
+        // La sesión se verifica en los métodos que lo requieren
+        $this->usuarioModel = new Usuario();
     }
 
-    public function listar() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        try {
-            $usuarioModel = new Usuario();
-            $usuarios = $usuarioModel->obtenerTodos();
-            
-            echo json_encode([
-                'success' => true,
-                'usuarios' => $usuarios
-            ]);
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error al obtener usuarios: ' . $e->getMessage()
-            ]);
-        }
+    // --- Vistas y Dashboards ---
+
+    public function index(): void {
+        $this->verificarAdmin();
+        $this->render('admin/usuarios', [
+            'usuarios' => $this->usuarioModel->obtenerTodos()
+        ]);
     }
 
-    public function obtenerDetalles() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        $id = $_GET['id'] ?? null;
-        
-        if (!$id) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID de usuario no proporcionado'
-            ]);
-            return;
-        }
-        
-        try {
-            $usuarioModel = new Usuario();
-            $usuario = $usuarioModel->obtenerPorId($id);
-            
-            if ($usuario) {
-                echo json_encode([
-                    'success' => true,
-                    'usuario' => $usuario
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Usuario no encontrado'
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error al obtener detalles: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function crear() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        try {
-            // Validación backend
-            $errores = [];
-            
-            // Validar nombres (solo letras, 2-50 caracteres)
-            $nombre = trim($_POST['nombres'] ?? '');
-            if (empty($nombre) || strlen($nombre) < 2 || strlen($nombre) > 50 || !preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/', $nombre)) {
-                $errores[] = 'Nombres inválidos (solo letras, 2-50 caracteres)';
-            }
-            
-            // Validar apellidos (solo letras, 2-50 caracteres)
-            $apellido = trim($_POST['apellidos'] ?? '');
-            if (empty($apellido) || strlen($apellido) < 2 || strlen($apellido) > 50 || !preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/', $apellido)) {
-                $errores[] = 'Apellidos inválidos (solo letras, 2-50 caracteres)';
-            }
-            
-            // Validar documento (solo números, 8-12 dígitos)
-            $documento = trim($_POST['documento'] ?? '');
-            if (empty($documento) || strlen($documento) < 8 || strlen($documento) > 12 || !preg_match('/^[0-9]+$/', $documento)) {
-                $errores[] = 'Documento inválido (solo números, 8-12 dígitos)';
-            }
-            
-            // Validar correo
-            $correo = trim($_POST['correo'] ?? '');
-            if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || strlen($correo) > 100) {
-                $errores[] = 'Correo electrónico inválido';
-            }
-            
-            // Validar teléfono (opcional pero si viene validar)
-            $telefono = trim($_POST['telefono'] ?? '');
-            if (!empty($telefono) && (strlen($telefono) < 7 || strlen($telefono) > 15 || !preg_match('/^[0-9+\s()-]+$/', $telefono))) {
-                $errores[] = 'Teléfono inválido (7-15 caracteres)';
-            }
-            
-            // Validar contraseña (mínimo 6 caracteres)
-            $contrasena = $_POST['contrasena'] ?? '';
-            if (empty($contrasena) || strlen($contrasena) < 6 || strlen($contrasena) > 50) {
-                $errores[] = 'La contraseña debe tener entre 6 y 50 caracteres';
-            }
-            
-            // Validar tecnologías
-            $tecnologias = trim($_POST['tecnologias'] ?? '');
-            if (empty($tecnologias) || strlen($tecnologias) < 2 || strlen($tecnologias) > 200) {
-                $errores[] = 'Tecnologías inválidas (2-200 caracteres)';
-            }
-            
-            $tipo_documento = trim($_POST['tipo_documento'] ?? '');
-            $area_trabajo = trim($_POST['area_trabajo'] ?? '');
-            $fecha_inicio = $_POST['fecha_inicio'] ?? '';
-            $rol = $_POST['rol'] ?? 'Desarrollador';
-            
-            // Si hay errores de validación, retornar
-            if (!empty($errores)) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => implode(', ', $errores)
-                ]);
-                return;
-            }
-            
-            // Convertir nombre de rol a id_rol
-            $id_rol = 2; // Por defecto Desarrollador
-            if ($rol === 'Administrador' || $rol === 'Admin') {
-                $id_rol = 1;
-            } elseif ($rol === 'Desarrollador') {
-                $id_rol = 2;
-            }
-            
-            // Crear usuario con datos sanitizados
-            $usuarioModel = new Usuario();
-            $resultado = $usuarioModel->crear([
-                'nombre' => htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'),
-                'apellido' => htmlspecialchars($apellido, ENT_QUOTES, 'UTF-8'),
-                'documento' => $documento,
-                'tipo_documento' => htmlspecialchars($tipo_documento, ENT_QUOTES, 'UTF-8'),
-                'correo' => $correo,
-                'telefono' => $telefono,
-                'area_trabajo' => htmlspecialchars($area_trabajo, ENT_QUOTES, 'UTF-8'),
-                'fecha_inicio' => $fecha_inicio,
-                'contrasena' => $contrasena,
-                'tecnologias' => htmlspecialchars($tecnologias, ENT_QUOTES, 'UTF-8'),
-                'id_rol' => $id_rol,
-                'activo' => 1
-            ]);
-            
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Usuario creado exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error al crear el usuario'
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function actualizar() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        try {
-            $id_usuario = $_POST['id_usuario'] ?? '';
-            
-            if (empty($id_usuario)) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'ID de usuario no proporcionado'
-                ]);
-                return;
-            }
-            
-            // Validación backend
-            $errores = [];
-            
-            // Validar nombres (solo letras, 2-50 caracteres)
-            $nombre = trim($_POST['nombres'] ?? '');
-            if (empty($nombre) || strlen($nombre) < 2 || strlen($nombre) > 50 || !preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/', $nombre)) {
-                $errores[] = 'Nombres inválidos (solo letras, 2-50 caracteres)';
-            }
-            
-            // Validar apellidos (solo letras, 2-50 caracteres)
-            $apellido = trim($_POST['apellidos'] ?? '');
-            if (empty($apellido) || strlen($apellido) < 2 || strlen($apellido) > 50 || !preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/', $apellido)) {
-                $errores[] = 'Apellidos inválidos (solo letras, 2-50 caracteres)';
-            }
-            
-            // Validar documento (solo números, 8-12 dígitos)
-            $documento = trim($_POST['documento'] ?? '');
-            if (!empty($documento) && (strlen($documento) < 8 || strlen($documento) > 12 || !preg_match('/^[0-9]+$/', $documento))) {
-                $errores[] = 'Documento inválido (solo números, 8-12 dígitos)';
-            }
-            
-            // Validar correo
-            $correo = trim($_POST['correo'] ?? '');
-            if (!filter_var($correo, FILTER_VALIDATE_EMAIL) || strlen($correo) > 100) {
-                $errores[] = 'Correo electrónico inválido';
-            }
-            
-            // Validar teléfono (opcional pero si viene validar)
-            $telefono = trim($_POST['telefono'] ?? '');
-            if (!empty($telefono) && (strlen($telefono) < 7 || strlen($telefono) > 15 || !preg_match('/^[0-9+\s()-]+$/', $telefono))) {
-                $errores[] = 'Teléfono inválido (7-15 caracteres)';
-            }
-            
-            // Validar contraseña solo si se proporciona
-            $contrasena = $_POST['contrasena'] ?? '';
-            if (!empty($contrasena) && (strlen($contrasena) < 6 || strlen($contrasena) > 50)) {
-                $errores[] = 'La contraseña debe tener entre 6 y 50 caracteres';
-            }
-            
-            // Validar tecnologías
-            $tecnologias = trim($_POST['tecnologias'] ?? '');
-            if (!empty($tecnologias) && (strlen($tecnologias) < 2 || strlen($tecnologias) > 200)) {
-                $errores[] = 'Tecnologías inválidas (2-200 caracteres)';
-            }
-            
-            $tipo_documento = trim($_POST['tipo_documento'] ?? '');
-            $area_trabajo = trim($_POST['area_trabajo'] ?? '');
-            $fecha_inicio = $_POST['fecha_inicio'] ?? '';
-            $rol = $_POST['rol'] ?? '';
-            
-            // Si hay errores de validación, retornar
-            if (!empty($errores)) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => implode(', ', $errores)
-                ]);
-                return;
-            }
-            
-            // Convertir nombre de rol a id_rol si se proporciona
-            $id_rol = null;
-            if (!empty($rol)) {
-                if ($rol === 'Administrador' || $rol === 'Admin') {
-                    $id_rol = 1;
-                } elseif ($rol === 'Desarrollador') {
-                    $id_rol = 2;
-                }
-            }
-            
-            $datos = [
-                'nombre' => htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8'),
-                'apellido' => htmlspecialchars($apellido, ENT_QUOTES, 'UTF-8'),
-                'documento' => $documento,
-                'tipo_documento' => htmlspecialchars($tipo_documento, ENT_QUOTES, 'UTF-8'),
-                'correo' => $correo,
-                'telefono' => $telefono,
-                'area_trabajo' => htmlspecialchars($area_trabajo, ENT_QUOTES, 'UTF-8'),
-                'fecha_inicio' => $fecha_inicio,
-                'tecnologias' => htmlspecialchars($tecnologias, ENT_QUOTES, 'UTF-8')
-            ];
-            
-            // Agregar id_rol si se proporcionó
-            if ($id_rol !== null) {
-                $datos['id_rol'] = $id_rol;
-            }
-            
-            // Solo actualizar contraseña si se proporciona
-            if (!empty($contrasena)) {
-                $datos['contrasena'] = $contrasena;
-            }
-            
-            $usuarioModel = new Usuario();
-            $resultado = $usuarioModel->actualizar($id_usuario, $datos);
-            
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Usuario actualizado exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error al actualizar el usuario'
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function bloquear() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        $id = $_GET['id'] ?? null;
-        
-        if (!$id) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID de usuario no proporcionado'
-            ]);
-            return;
-        }
-        
-        try {
-            $usuarioModel = new Usuario();
-            $resultado = $usuarioModel->actualizarEstado($id, 0);
-            
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Usuario bloqueado exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error al bloquear el usuario'
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function activar() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        $id = $_GET['id'] ?? null;
-        
-        if (!$id) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID de usuario no proporcionado'
-            ]);
-            return;
-        }
-        
-        try {
-            $usuarioModel = new Usuario();
-            $resultado = $usuarioModel->actualizarEstado($id, 1);
-            
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Usuario activado exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error al activar el usuario'
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function eliminar() {
-        AuthMiddleware::verificarRol(['Admin']);
-        header('Content-Type: application/json');
-        
-        $id = $_GET['id'] ?? null;
-        
-        if (!$id) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID de usuario no proporcionado'
-            ]);
-            return;
-        }
-        
-        try {
-            $usuarioModel = new Usuario();
-            
-            // Primero verificar si el usuario tiene tareas asignadas
-            $totalTareas = $usuarioModel->contarTareasAsignadas($id);
-            
-            if ($totalTareas > 0) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => "No se puede eliminar el usuario porque tiene {$totalTareas} tarea(s) asignada(s). Por favor, reasigne o elimine las tareas primero, o marque el usuario como inactivo en su lugar."
-                ]);
-                return;
-            }
-            
-            // Si no tiene tareas, proceder con la eliminación
-            $resultado = $usuarioModel->eliminar($id);
-            
-            if ($resultado) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Usuario eliminado exitosamente'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error al eliminar el usuario'
-                ]);
-            }
-        } catch (PDOException $e) {
-            // Capturar específicamente errores de restricción de clave foránea
-            if ($e->getCode() == '23000') {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'No se puede eliminar este usuario porque tiene registros relacionados (tareas, proyectos, etc.). Considere marcarlo como inactivo en su lugar.'
-                ]);
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Error: ' . $e->getMessage()
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function dashboardAdmin() {
-        // Verificar que el usuario esté autenticado y sea Admin
-        AuthMiddleware::verificarRol(['Admin']);
-        
-        // Obtener todos los proyectos con encargados
+    public function dashboardAdmin(): void {
+        $this->verificarAdmin();
         $proyectoModel = new Proyecto();
-        $proyectos = $proyectoModel->obtenerTodosConEncargados();
-        
-        // Pasar los datos a la vista
-        $this->render('admin/dashboard', ['proyectos' => $proyectos]);
+        $this->render('admin/dashboard', [
+            'proyectos' => $proyectoModel->obtenerTodosConEncargados()
+        ]);
     }
 
-    public function dashboardDesarrollador() {
-        // Verificar que el usuario esté autenticado y sea Desarrollador
-        AuthMiddleware::verificarRol(['Desarrollador']);
-        
-        // Dashboard para desarrollador
+    public function dashboardDesarrollador(): void {
+        if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Desarrollador') {
+            redirect('Auth', 'login');
+        }
         $this->render('desarrollador/dashboard');
     }
 
-    public function dashboardGestor() {
-        // Verificar que el usuario esté autenticado y sea Gestor
-        AuthMiddleware::verificarRol(['Gestor de Proyecto']);
-        
-        // Dashboard para gestor de proyecto
-        $proyectoModel = new Proyecto();
-        $proyectos = $proyectoModel->obtenerTodosConEncargados();
-        
-        // Pasar los datos a la vista
-        $this->render('admin/dashboard', ['proyectos' => $proyectos]);
+    // --- API Endpoints para Gestión de Usuarios (JSON) ---
+
+    public function listar(): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() {
+            $filtros = $this->obtenerFiltros(['area_trabajo']);
+            return ['usuarios' => $this->usuarioModel->obtenerTodos($filtros)];
+        });
     }
 
-    public function dashboard() {
-        // Método principal del dashboard que redirige según el rol
-        session_start();
-        
-        if (!isset($_SESSION['usuario'])) {
-            redirect('Auth', 'login');
-        }
+    public function obtenerDetalles(): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() {
+            $id = $_GET['id'] ?? null;
+            if (!$id) {
+                return ['exito' => false, 'mensaje' => 'ID de usuario no proporcionado'];
+            }
+            $usuario = $this->usuarioModel->obtenerPorId($id);
+            if ($usuario) {
+                return ['usuario' => $usuario];
+            }
+            return ['exito' => false, 'mensaje' => 'Usuario no encontrado'];
+        });
+    }
 
-        $rol = $_SESSION['usuario']['rol'] ?? '';
-        
-        switch ($rol) {
-            case 'Admin':
-                $this->dashboardAdmin();
-                break;
-            case 'Desarrollador':
-                $this->dashboardDesarrollador();
-                break;
-            default:
-                redirect('Auth', 'login');
-        }
+    public function crear(): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() {
+            $datos = $this->getInput();
+            $this->validarCampos($datos, ['nombres', 'apellidos', 'documento', 'correo', 'contrasena', 'tecnologias', 'rol']);
+
+            // Aquí puedes agregar validaciones más específicas si lo deseas
+            if ($datos['contrasena'] !== $datos['confirmar_contrasena']) {
+                return ['exito' => false, 'mensaje' => 'Las contraseñas no coinciden'];
+            }
+
+            // Mapeo de rol a id_rol
+            $id_rol = ($datos['rol'] === 'Administrador' || $datos['rol'] === 'Admin') ? 1 : 2;
+
+            $resultado = $this->usuarioModel->crear([
+                'nombre' => $this->sanitizar($datos['nombres']),
+                'apellido' => $this->sanitizar($datos['apellidos']),
+                'documento' => $datos['documento'],
+                'tipo_documento' => $this->sanitizar($datos['tipo_documento']),
+                'correo' => $datos['correo'],
+                'telefono' => $datos['telefono'],
+                'area_trabajo' => $this->sanitizar($datos['area_trabajo']),
+                'fecha_inicio' => $datos['fecha_inicio'],
+                'contrasena' => $datos['contrasena'],
+                'tecnologias' => $this->sanitizar($datos['tecnologias']),
+                'id_rol' => $id_rol,
+                'activo' => 1
+            ]);
+
+            return $resultado
+                ? ['mensaje' => 'Usuario creado exitosamente']
+                : ['exito' => false, 'mensaje' => 'Error al crear el usuario'];
+        });
+    }
+
+    public function actualizar(): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() {
+            $datos = $this->getInput();
+            $id_usuario = $datos['id_usuario'] ?? null;
+            if (!$id_usuario) {
+                return ['exito' => false, 'mensaje' => 'ID de usuario no proporcionado'];
+            }
+
+            // Validaciones
+            $this->validarCampos($datos, ['nombres', 'apellidos', 'correo', 'rol']);
+            if (!empty($datos['contrasena']) && $datos['contrasena'] !== $datos['confirmar_contrasena']) {
+                return ['exito' => false, 'mensaje' => 'Las contraseñas no coinciden'];
+            }
+
+            // Preparar datos para actualizar
+            $datosActualizar = [
+                'nombre' => $this->sanitizar($datos['nombres']),
+                'apellido' => $this->sanitizar($datos['apellidos']),
+                'documento' => $datos['documento'],
+                'tipo_documento' => $this->sanitizar($datos['tipo_documento']),
+                'correo' => $datos['correo'],
+                'telefono' => $datos['telefono'],
+                'area_trabajo' => $this->sanitizar($datos['area_trabajo']),
+                'fecha_inicio' => $datos['fecha_inicio'],
+                'tecnologias' => $this->sanitizar($datos['tecnologias']),
+                'id_rol' => ($datos['rol'] === 'Administrador' || $datos['rol'] === 'Admin') ? 1 : 2,
+            ];
+
+            if (!empty($datos['contrasena'])) {
+                $datosActualizar['contrasena'] = $datos['contrasena'];
+            }
+
+            $resultado = $this->usuarioModel->actualizar($id_usuario, $datosActualizar);
+
+            return $resultado
+                ? ['mensaje' => 'Usuario actualizado exitosamente']
+                : ['exito' => false, 'mensaje' => 'Error al actualizar el usuario'];
+        });
+    }
+
+    private function cambiarEstado(int $estado, string $mensajeExito, string $mensajeError): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() use ($estado, $mensajeExito, $mensajeError) {
+            $id = $_GET['id'] ?? null;
+            if (!$id) {
+                return ['exito' => false, 'mensaje' => 'ID de usuario no proporcionado'];
+            }
+            $resultado = $this->usuarioModel->actualizarEstado($id, $estado);
+            return $resultado
+                ? ['mensaje' => $mensajeExito]
+                : ['exito' => false, 'mensaje' => $mensajeError];
+        });
+    }
+
+    public function bloquear(): void {
+        $this->cambiarEstado(0, 'Usuario bloqueado exitosamente', 'Error al bloquear el usuario');
+    }
+
+    public function activar(): void {
+        $this->cambiarEstado(1, 'Usuario activado exitosamente', 'Error al activar el usuario');
+    }
+
+    public function eliminar(): void {
+        $this->verificarAdmin();
+        $this->ejecutarOperacion(function() {
+            $id = $_GET['id'] ?? null;
+            if (!$id) {
+                return ['exito' => false, 'mensaje' => 'ID de usuario no proporcionado'];
+            }
+            // Eliminación segura en transacción: desvincula tareas y borra el usuario.
+            $resultado = $this->usuarioModel->eliminarConTransaccion($id);
+            return $resultado
+                ? ['mensaje' => 'Usuario eliminado permanentemente']
+                : ['exito' => false, 'mensaje' => 'Error al eliminar el usuario'];
+        });
     }
 }

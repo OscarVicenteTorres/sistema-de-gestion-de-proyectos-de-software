@@ -185,7 +185,7 @@ class Proyecto
             // Determinar estado según el porcentaje
             $nuevoEstado = 'Pendiente';
             if ($promedio > 0 && $promedio < 100) {
-                $nuevoEstado = 'Activo';
+                $nuevoEstado = 'Activo'; // O 'En Desarrollo' si prefieres
             } elseif ($promedio >= 100) {
                 $nuevoEstado = 'Completado';
             }
@@ -233,17 +233,53 @@ class Proyecto
     }
 
 
+
+    //   Obtener estadísticas generales de proyectos
+    //  (CORREGIDO PARA CONTAR 'en_curso' CORRECTAMENTE)
     public function obtenerEstadisticas()
     {
         $sql = "
         SELECT 
-            COUNT(*) AS total,
-            SUM(CASE WHEN estado IN ('En progreso', 'Pendiente') THEN 1 ELSE 0 END) AS activos,
-            SUM(CASE WHEN estado = 'Completado' THEN 1 ELSE 0 END) AS completados
+            COUNT(*) AS total_registrados,
+            SUM(CASE WHEN estado = 'Completado' THEN 1 ELSE 0 END) AS completados,
+            SUM(CASE WHEN estado = 'Vencido' THEN 1 ELSE 0 END) AS vencidos,
+            SUM(CASE WHEN estado NOT IN ('Completado', 'Vencido') THEN 1 ELSE 0 END) AS en_curso -- CORREGIDO: Cuenta todo lo que no esté completado o vencido
         FROM proyectos
-    ";
+        ";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Asegurar que todos los valores sean numéricos (evita NULLs si la tabla está vacía)
+        $stats['total_registrados'] = (int)($stats['total_registrados'] ?? 0);
+        $stats['completados'] = (int)($stats['completados'] ?? 0);
+        $stats['vencidos'] = (int)($stats['vencidos'] ?? 0);
+        $stats['en_curso'] = (int)($stats['en_curso'] ?? 0);
+
+        return $stats;
+    }
+
+    public function obtenerProyectosPorUsuario($id_usuario)
+    {
+        $sql = "SELECT 
+                p.id_proyecto,
+                p.nombre,
+                p.descripcion,
+                p.fecha_inicio,
+                p.fecha_fin,
+                p.estado,
+                p.area AS categoria,
+                p.porcentaje_avance
+            FROM proyectos p
+            INNER JOIN tareas t ON p.id_proyecto = t.id_proyecto
+            WHERE t.id_usuario = :id_usuario
+            GROUP BY p.id_proyecto
+            ORDER BY p.fecha_inicio DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
