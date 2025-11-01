@@ -50,8 +50,8 @@
 
             <h2>Resumen de Proyectos</h2>
             <div class="stats">
-                <div class="card total">Totales: <span><?= $estadisticas['total'] ?? 0 ?></span></div>
-                <div class="card activos">Activos: <span><?= $estadisticas['activos'] ?? 0 ?></span></div>
+                <div class="card total">Totales: <span><?= $estadisticas['total_registrados'] ?? 0 ?></span></div>
+                <div class="card activos">En Curso: <span><?= $estadisticas['en_curso'] ?? 0 ?></span></div>
                 <div class="card completados">Completados: <span><?= $estadisticas['completados'] ?? 0 ?></span></div>
             </div>
 
