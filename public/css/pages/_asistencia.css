@@ -2,21 +2,20 @@
 
 /* Contenedor principal */
 .container-asistencia {
-    width: 90%;
-    max-width: 1000px;
+    width: 100%;
+    height: 100vh;
     background-color: #131A36;
     padding: 40px 50px;
-    border-radius: 25px;
-    margin: 50px auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     color: #FFFFFF;
 }
 
-.container-asistencia:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-}
 
 /* Título principal */
 .container-asistencia h1 {
