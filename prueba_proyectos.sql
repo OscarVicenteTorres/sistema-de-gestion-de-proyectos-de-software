@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2025 a las 21:10:42
+-- Tiempo de generación: 02-11-2025 a las 01:23:13
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -36,20 +36,13 @@ CREATE TABLE `asistencias` (
   `estado` enum('Presente','Tarde','Ausente') DEFAULT 'Presente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
-
 --
--- Estructura de tabla para la tabla `justificaciones`
+-- Volcado de datos para la tabla `asistencias`
 --
 
-CREATE TABLE `justificaciones` (
-  `id_justificacion` int(10) UNSIGNED NOT NULL,
-  `id_asistencia` int(10) UNSIGNED NOT NULL,
-  `motivo` text NOT NULL,
-  `nueva_fecha` date DEFAULT NULL,
-  `estado` enum('Pendiente','Aprobada','Rechazada') DEFAULT 'Pendiente',
-  `fecha_envio` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `asistencias` (`id_asistencia`, `id_usuario`, `fecha`, `hora_entrada`, `hora_salida`, `estado`) VALUES
+(1, 21, '2025-10-29', '09:29:28', '10:51:13', 'Presente'),
+(2, 21, '2025-11-01', '12:05:38', '19:15:01', 'Presente');
 
 -- --------------------------------------------------------
 
@@ -69,12 +62,20 @@ CREATE TABLE `justificaciones_tareas` (
   `comentarios_admin` text DEFAULT NULL COMMENT 'Comentarios adicionales del administrador'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Justificaciones para extensión de tiempo en tareas (no asistencias)';
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `justificaciones_tareas`
+-- Estructura de tabla para la tabla `notas_tareas`
 --
 
-INSERT INTO `justificaciones_tareas` (`id_justificacion_tarea`, `id_tarea`, `motivo`, `nueva_fecha_limite`, `estado`, `fecha_solicitud`, `fecha_respuesta`, `respondido_por`, `comentarios_admin`) VALUES
-(2, 4, 'Se requiere tiempo adicional para investigar mejores prácticas de UX/UI según feedback del cliente', '2025-10-27', 'Pendiente', '2025-10-06 18:56:02', NULL, NULL, NULL);
+CREATE TABLE `notas_tareas` (
+  `id_nota` int(10) UNSIGNED NOT NULL,
+  `id_tarea` int(10) UNSIGNED NOT NULL,
+  `porcentaje_anterior` tinyint(4) DEFAULT 0 COMMENT 'Porcentaje anterior antes de esta actualización',
+  `porcentaje_nuevo` tinyint(4) DEFAULT 0 COMMENT 'Nuevo porcentaje actualizado',
+  `nota_desarrollador` text DEFAULT NULL COMMENT 'Nota/reporte del desarrollador sobre el avance',
+  `fecha_envio` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Fecha y hora en que se envió el avance'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Historial de avances y cambios de porcentaje en tareas';
 
 -- --------------------------------------------------------
 
@@ -117,11 +118,9 @@ CREATE TABLE `proyectos` (
 --
 
 INSERT INTO `proyectos` (`id_proyecto`, `nombre`, `descripcion`, `fecha_inicio`, `fecha_fin`, `estado`, `area`, `porcentaje_avance`, `cliente`, `recursos`, `tecnologias`, `id_usuario_creador`) VALUES
-(5, 'Sistema de Gestión Web', 'hoal coasoadwefwfgwf', '2025-09-30', '2025-11-08', 'Pendiente', 'Tienda virtual', 0, '1223132143122 ', 'git', 'jnode', 1),
-(8, 'werwe', 'wafe', '2025-09-28', '2025-11-07', 'Pendiente', 'Plataforma SaaS', 0, 'wfe', 'fe', 'fae', 1),
-(10, 'fewfe', 'wafewaef', '2025-09-28', '2025-08-27', 'Pendiente', 'Landing page', 0, 'wefaf', 'efwaaewf', 'fewaawef', 1),
-(11, 'hopoas', 'gdffg', '2025-10-02', '2025-10-29', 'Pendiente', 'Landing page', 0, 'fdsfssfdfweeer2334324242', 'sdgfdsgfsgsegr', 'esrggsdf', 5),
-(12, 'botic app', 'bueno es un gestor de inventario para botica', '2024-10-04', '2026-02-15', 'En Desarrollo', 'Software de gestión', 60, '205428379284 gruvitec', 'no tenemos el enlace  :(', 'creo que es php mysql boostrap html y js mas css', 5);
+(12, 'botic app', 'bueno es un gestor de inventario para botica', '2024-10-04', '2026-02-15', 'En Desarrollo', 'Software de gestión', 60, '205428379284 gruvitec', 'no tenemos el enlace  :(', 'creo que es php mysql boostrap html y js mas css', 5),
+(17, 'tienda virtual', 'este es un proyecto de e comerce tienda vitual', '2025-10-27', '2025-11-08', 'Pendiente', 'Tienda virtual', 0, '1223131432', 'git ', 'node .js', 5),
+(18, 'pagina ', 'sera una pagina web que se puedam crear a base de todo lo indicado', '2025-10-28', '2025-11-08', 'Pendiente', 'Landing page', 0, '1223131432', 'git ', 'python php javascript', 5);
 
 -- --------------------------------------------------------
 
@@ -140,8 +139,7 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 (1, 'Admin'),
-(2, 'Desarrollador'),
-(3, 'Gestor de Proyecto');
+(2, 'Desarrollador');
 
 -- --------------------------------------------------------
 
@@ -152,7 +150,7 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 CREATE TABLE `tareas` (
   `id_tarea` int(10) UNSIGNED NOT NULL,
   `id_proyecto` int(10) UNSIGNED NOT NULL,
-  `id_usuario` int(10) UNSIGNED NOT NULL,
+  `id_usuario` int(10) UNSIGNED DEFAULT NULL,
   `titulo` varchar(100) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `area_asignada` enum('Frontend','Backend','Infraestructura') DEFAULT 'Frontend' COMMENT 'Área de trabajo asignada para la tarea',
@@ -168,12 +166,12 @@ CREATE TABLE `tareas` (
 --
 
 INSERT INTO `tareas` (`id_tarea`, `id_proyecto`, `id_usuario`, `titulo`, `descripcion`, `area_asignada`, `fecha_inicio`, `fecha_limite`, `estado`, `porcentaje_avance`, `fecha_creacion`) VALUES
-(4, 5, 2, 'Diseño de interfaz principal', 'Crear mockups y diseño de la pantalla principal del sistema', 'Frontend', '2025-10-07', '2025-10-20', 'En Progreso', 30, '2025-10-06 18:35:13'),
-(5, 5, 4, 'API de autenticación', 'Desarrollar endpoints para login, logout y validación de tokens', 'Backend', '2025-10-07', '2025-10-15', 'Pendiente', 0, '2025-10-06 18:35:13'),
-(6, 12, 11, 'Configuración de servidor', 'Configurar ambiente de producción y deployment', 'Infraestructura', '2025-10-08', '2025-10-25', 'Pendiente', 0, '2025-10-06 18:35:13'),
-(7, 5, 2, 'Diseño de interfaz principal', 'Crear mockups y diseño de la pantalla principal del sistema', 'Frontend', '2025-10-07', '2025-10-20', 'En Progreso', 30, '2025-10-06 18:56:02'),
-(8, 5, 4, 'API de autenticación', 'Desarrollar endpoints para login, logout y validación de tokens', 'Backend', '2025-10-07', '2025-10-15', 'Pendiente', 0, '2025-10-06 18:56:02'),
-(9, 12, 11, 'Configuración de servidor', 'Configurar ambiente de producción y deployment', 'Infraestructura', '2025-10-08', '2025-10-25', 'Pendiente', 0, '2025-10-06 18:56:02');
+(6, 12, 13, 'Configuración de servidor', 'Configurar ambiente de producción y deployment', 'Frontend', '2025-10-08', '2025-10-25', 'Pendiente', 0, '2025-10-06 18:35:13'),
+(21, 12, 5, 'crear api para backend', 'debes crear una api para listar los usuarios del sistema quiero que los resultados los bote en formato json para mayor seguridad', 'Backend', '2025-10-27', '2025-10-29', 'Pendiente', 0, '2025-10-27 17:06:29'),
+(22, 18, 13, 'investigar', 'tienes que investigar que ase la pagina etc', 'Frontend', '2025-10-28', '2025-10-28', 'Pendiente', 0, '2025-10-28 16:14:05'),
+(23, 12, 25, 'SDAD', 'DSADA', 'Frontend', '2025-11-01', '2025-11-18', 'Pendiente', 0, '2025-11-01 21:59:55'),
+(24, 12, 13, 'HOLA', 'DWADA', 'Frontend', '2025-11-01', '2025-11-29', 'Pendiente', 0, '2025-11-01 22:05:53'),
+(25, 17, 21, 'Configurar backend API', 'Crear endpoints REST para la tienda virtual en Node.js', 'Backend', '2025-10-27', '2025-11-05', 'Pendiente', 0, '2025-11-02 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -203,18 +201,20 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo`, `documento`, `tipo_documento`, `telefono`, `area_trabajo`, `fecha_inicio`, `tecnologias`, `contrasena`, `id_rol`, `activo`, `fecha_creacion`) VALUES
-(1, 'Administrador Sistema', 'Sistema', 'admin@empresa.com', '12345678', 'DNI', '999888777', 'Administración', '2024-01-01', 'PHP, MySQL, JavaScript', '$2y$10$cQ7f1E/9dQtDXETFmsGDKeCY2eRxwSlnC2CY5ky7ub03CccQfr35u', 1, 1, '2025-10-04 05:18:56'),
-(2, 'Juan Pérez', 'Pérez', 'juan.perez@empresa.com', '87654321', 'DNI', '999777666', 'Frontend', '2024-02-01', 'React, Vue, CSS', '$2y$10$cQ7f1E/9dQtDXETFmsGDKeCY2eRxwSlnC2CY5ky7ub03CccQfr35u', 2, 0, '2025-10-04 05:18:56'),
-(3, 'María García', 'García', 'maria.garcia@empresa.com', '11223344', 'DNI', '999666555', 'Gerencia', '2024-01-15', 'Project Management, Scrum', '$2y$10$cQ7f1E/9dQtDXETFmsGDKeCY2eRxwSlnC2CY5ky7ub03CccQfr35u', 3, 1, '2025-10-04 05:18:56'),
+(1, 'Administrador Sistema', 'Sistema', 'admin@empresa.com', '12345678', 'DNI', '999888777', 'Administración', '2024-01-01', 'PHP, MySQL, JavaScript', '$2y$10$cQ7f1E/9dQtDXETFmsGDKeCY2eRxwSlnC2CY5ky7ub03CccQfr35u', 1, 0, '2025-10-04 05:18:56'),
 (4, 'Carlos López', 'López', 'carlos.lopez@empresa.com', '44332211', 'DNI', '999555444', 'Backend', '2024-03-01', 'PHP, Python, Node.js', '$2y$10$cQ7f1E/9dQtDXETFmsGDKeCY2eRxwSlnC2CY5ky7ub03CccQfr35u', 2, 1, '2025-10-04 05:18:56'),
-(5, 'Brayan', 'brayan', 'champibrayan14@gmail.com', '77021283', 'DNI', '946674643', 'Desarrollo', '2024-10-04', 'PHP, JavaScript, MySQL', '$2y$10$Kk2d3o6wh6RxFnAn/553cuXUmU/yTkQwgfisoAENpeHduRkRL48ni', 1, 1, '2025-10-04 14:12:08'),
-(6, 'leo', 'villegas', 'admin@empresas.com', '1234567678', 'DNI', '94667467432', 'Gerencia', '2025-10-04', 'h', '$2y$10$Jiv2m3XjIv6TRnF/nMpOXOh/1rRqaF5n3d08dZWmuZSVK1.6jSrjS', 2, 1, '2025-10-04 14:22:07'),
-(7, 'pedro', 'adrianse', 'pedro@senati.pe', '12131213423', 'DNI', '94667467432', 'Frontend', '2025-10-04', 'hola como estas este es pedrro sabe usar el phonk muy bien es bueno en fronennet y nose que mas decir', '$2y$10$YmHRdmDyfnV0ds8q1VWNKeAPoZpLMGDYnHne54wel.KzsQcIGlYHO', 2, 0, '2025-10-04 15:08:22'),
-(9, 'Brayan', 'Pauccara', 'hola@gmail.com', '1234567678', 'DNI', '946674643dfhfhd', 'Backend', '2025-10-11', 'dssefsef', '$2y$10$bzRIju8Wxn.C6DlcTTz4n.tHUJJKf/qjZsW5tXNHCRnwF/7ArRhuy', 2, 1, '2025-10-04 18:21:26'),
-(10, 'PEDRO', 'ADRIANSEN', 'PEDRO@GMAIL.COM', '1234567678', 'DNI', '946674643', 'Frontend', '2025-10-04', 'jnode', '$2y$10$l0DfOEqgKV70.QpJQkm3AOGoawF5NJzQiLtBoECn1FymM6g5mbrRK', 2, 0, '2025-10-04 18:48:46'),
-(11, 'OSCAR', 'VICENTE TORRES', 'oscarvicente@gruvitec.com', '12345678', 'DNI', '990077356', 'Fullstack', '2025-10-04', '...', '$2y$10$c5IH9JOGvBMq.0zeFr.F0.JvvRuqwf0WpRShYGkyQOMevtjp2UFqi', 1, 1, '2025-10-04 18:54:55'),
-(12, 'hola', 'fesfes', 'holas123@gmail.com', 'sefsfs', 'DNI', 'wdadada', 'Frontend', '2025-10-04', 'awdad', '$2y$10$1vo0g51w5d//VH1dwdmmxuO.i6fDWE3g6dDg7T.cHj7.3D.7Vrx0y', 2, 1, '2025-10-04 19:03:55'),
-(13, 'Pedro ', 'adriansen flores', 'pedrojoaquin@gmail.com', '70601679', 'DNI', '904669214', 'Frontend', '2025-10-04', 'react css python php java script woordpres etc', '$2y$10$yU2Ou8mSyytauHX9ZzO2/OOJROHSyA99S.e0t/EBzI1Y9arRWKX0K', 1, 1, '2025-10-04 19:11:18');
+(5, 'Brayan', 'brayan', 'champibrayan14@gmail.com', '77021283', 'DNI', '946674643', 'Backend\r\n', '2024-10-04', 'PHP, JavaScript, MySQL', '$2y$10$Kk2d3o6wh6RxFnAn/553cuXUmU/yTkQwgfisoAENpeHduRkRL48ni', 1, 1, '2025-10-04 14:12:08'),
+(6, 'leonard', 'villegas', 'admin@empresas.com', '123456767823', 'DNI', '94667467432', 'Backend', '2025-10-04', 'h', '$2y$10$Jiv2m3XjIv6TRnF/nMpOXOh/1rRqaF5n3d08dZWmuZSVK1.6jSrjS', 1, 0, '2025-10-04 14:22:07'),
+(11, 'OSCAR', 'VICENTE TORRES', 'oscarvicente@gruvitec.com', '12345678', 'DNI', '990077356', 'Fullstack', '2025-10-04', '...', '$2y$10$c5IH9JOGvBMq.0zeFr.F0.JvvRuqwf0WpRShYGkyQOMevtjp2UFqi', 1, 0, '2025-10-04 18:54:55'),
+(13, 'Pedro ', 'adriansen flores', 'pedrojoaquin@gmail.com', '70601679', 'DNI', '904669214', 'Frontend', '2025-10-04', 'react css python php java script woordpres etc', '$2y$10$yU2Ou8mSyytauHX9ZzO2/OOJROHSyA99S.e0t/EBzI1Y9arRWKX0K', 1, 1, '2025-10-04 19:11:18'),
+(17, 'leo', 'sar', 'usuario123@gmail.com', '77021283', 'DNI', '77021283', 'Frontend', '2025-10-28', 'react', '$2y$10$H0cb9ev1GZzTaMWcViyN2e.8bbuI07bos.0Wnn73wjvv65jVKC3C2', 1, 1, '2025-10-28 17:43:53'),
+(19, 'hor', 'das', 'les@gmail.com', '2342342443', 'DNI', '97656473', 'Fullstack', '2025-10-28', 'sdadsad', '$2y$10$W5ThJy3ouXLnjWDVP0NADeOlvAGb1e01wt7lTiSzuMMqMEwOOojk.', 2, 0, '2025-10-28 17:49:45'),
+(21, 'Brayan', 'Champi', 'holas123@gmail.com', '77021283', 'DNI', '23453453354', 'Backend', '2025-10-28', 'node .js', '$2y$10$hQ9EZVlC9R3SW7ffBmzBIO5rMx8mEWNjqVxC9GlnSOuWWLBlBzfhW', 2, 1, '2025-10-28 17:50:45'),
+(25, 'Brayan', 'Champi', 'champibrayan14@gmai.com', '77021283', 'DNI', '23432432523', 'Frontend', '2025-10-28', 'node .js', '$2y$10$8OyxuLX3SG60kOkYC7ihReJMVFS5bw00UrBWPIwINqtiSs14EgB3a', 1, 1, '2025-10-28 17:52:10'),
+(27, 'roanl', 'ser', 'champibraya@gmail.com', '23423423', 'DNI', '23424234', 'Frontend', '2025-10-28', 'react', '$2y$10$3mYZn2i8QAzodjiA5gtSLO1Kk5/148PBzVaEHQHMBCfhmcVQoXg46', 2, 0, '2025-10-28 18:20:21'),
+(31, 'reaseee', 'asda', 'reas@gmail.com', '32466788', 'DNI', '23465487689', 'Frontend', '2025-10-28', 'react', '$2y$10$aXFDGSCCn4UCB3rsfOJwQOgKCnnuOld8wpjm7Ke.Y1N4hfwGVLWMm', 1, 1, '2025-10-28 18:36:56'),
+(32, 'fads', 'ffdsa', 's@gmail.com', '3453535353', 'DNI', '34563465345', 'Frontend', '2025-10-28', 'react', '$2y$10$HEyL88h1uERgPCivu2ebTe4EaClPjvyxW7kImpPRilpzPf39VuMPW', 1, 0, '2025-10-28 18:41:43'),
+(34, 'rest', 'dsada', 'e@gmail.com', '23424242', 'DNI', '2342422353', 'Frontend', '2025-10-28', 'react', '$2y$10$Blqi7Zp29u9iZ3r99wUd.Ohm4e4bMUmAagD2sOAqZ3pX/q./EO9f2', 1, 0, '2025-10-28 18:47:05');
 
 --
 -- Índices para tablas volcadas
@@ -229,13 +229,6 @@ ALTER TABLE `asistencias`
   ADD KEY `idx_estado` (`estado`);
 
 --
--- Indices de la tabla `justificaciones`
---
-ALTER TABLE `justificaciones`
-  ADD PRIMARY KEY (`id_justificacion`),
-  ADD KEY `id_asistencia` (`id_asistencia`);
-
---
 -- Indices de la tabla `justificaciones_tareas`
 --
 ALTER TABLE `justificaciones_tareas`
@@ -244,6 +237,14 @@ ALTER TABLE `justificaciones_tareas`
   ADD KEY `respondido_por` (`respondido_por`),
   ADD KEY `idx_estado_justificacion` (`estado`),
   ADD KEY `idx_fecha_solicitud` (`fecha_solicitud`);
+
+--
+-- Indices de la tabla `notas_tareas`
+--
+ALTER TABLE `notas_tareas`
+  ADD PRIMARY KEY (`id_nota`),
+  ADD KEY `id_tarea` (`id_tarea`),
+  ADD KEY `idx_fecha_envio` (`fecha_envio`);
 
 --
 -- Indices de la tabla `notificaciones`
@@ -290,19 +291,19 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id_asistencia` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `justificaciones`
---
-ALTER TABLE `justificaciones`
-  MODIFY `id_justificacion` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_asistencia` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `justificaciones_tareas`
 --
 ALTER TABLE `justificaciones_tareas`
   MODIFY `id_justificacion_tarea` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `notas_tareas`
+--
+ALTER TABLE `notas_tareas`
+  MODIFY `id_nota` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
@@ -314,7 +315,7 @@ ALTER TABLE `notificaciones`
 -- AUTO_INCREMENT de la tabla `proyectos`
 --
 ALTER TABLE `proyectos`
-  MODIFY `id_proyecto` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_proyecto` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -326,13 +327,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `tareas`
 --
 ALTER TABLE `tareas`
-  MODIFY `id_tarea` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_tarea` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_usuario` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Restricciones para tablas volcadas
@@ -345,17 +346,17 @@ ALTER TABLE `asistencias`
   ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
 
 --
--- Filtros para la tabla `justificaciones`
---
-ALTER TABLE `justificaciones`
-  ADD CONSTRAINT `justificaciones_ibfk_1` FOREIGN KEY (`id_asistencia`) REFERENCES `asistencias` (`id_asistencia`);
-
---
 -- Filtros para la tabla `justificaciones_tareas`
 --
 ALTER TABLE `justificaciones_tareas`
   ADD CONSTRAINT `justificaciones_tareas_ibfk_1` FOREIGN KEY (`id_tarea`) REFERENCES `tareas` (`id_tarea`) ON DELETE CASCADE,
   ADD CONSTRAINT `justificaciones_tareas_ibfk_2` FOREIGN KEY (`respondido_por`) REFERENCES `usuarios` (`id_usuario`);
+
+--
+-- Filtros para la tabla `notas_tareas`
+--
+ALTER TABLE `notas_tareas`
+  ADD CONSTRAINT `notas_tareas_ibfk_1` FOREIGN KEY (`id_tarea`) REFERENCES `tareas` (`id_tarea`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `notificaciones`
@@ -374,7 +375,7 @@ ALTER TABLE `proyectos`
 --
 ALTER TABLE `tareas`
   ADD CONSTRAINT `tareas_ibfk_1` FOREIGN KEY (`id_proyecto`) REFERENCES `proyectos` (`id_proyecto`),
-  ADD CONSTRAINT `tareas_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
+  ADD CONSTRAINT `tareas_ibfk_2` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `usuarios`

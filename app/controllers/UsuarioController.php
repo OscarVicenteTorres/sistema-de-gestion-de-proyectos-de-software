@@ -15,13 +15,51 @@ class UsuarioController extends BaseApiController {
     // --- Vistas y Dashboards ---
 
     public function index(): void {
+        // Asegurarse de que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         $this->verificarAdmin();
         $this->render('admin/usuarios', [
             'usuarios' => $this->usuarioModel->obtenerTodos()
         ]);
     }
 
+    /**
+     * Método dinámico que redirije al dashboard correcto según el rol del usuario
+     */
+    public function dashboard(): void {
+        // Asegurarse de que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['usuario'])) {
+            header('Location: ?c=Auth&a=login');
+            exit;
+        }
+
+        // Si es admin (id_rol = 1), mostrar dashboard admin
+        if ($_SESSION['usuario']['id_rol'] == 1) {
+            $this->dashboardAdmin();
+        }
+        // Si es desarrollador (id_rol = 2), mostrar dashboard desarrollador
+        elseif ($_SESSION['usuario']['id_rol'] == 2) {
+            $this->dashboardDesarrollador();
+        }
+        else {
+            header('Location: ?c=Auth&a=login');
+            exit;
+        }
+    }
+
     public function dashboardAdmin(): void {
+        // Asegurarse de que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         $this->verificarAdmin();
         $proyectoModel = new Proyecto();
         $this->render('admin/dashboard', [
@@ -30,10 +68,20 @@ class UsuarioController extends BaseApiController {
     }
 
     public function dashboardDesarrollador(): void {
-        if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'Desarrollador') {
-            redirect('Auth', 'login');
+        // Asegurarse de que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-        $this->render('desarrollador/dashboard');
+
+        if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['id_rol'] != 2) {
+            header('Location: ?c=Auth&a=login');
+            exit;
+        }
+
+        // Delegar al controlador especializado
+        require_once __DIR__ . '/DashboardDesarrolladorController.php';
+        $dashboardController = new DashboardDesarrolladorController();
+        $dashboardController->index();
     }
 
     // --- API Endpoints para Gestión de Usuarios (JSON) ---

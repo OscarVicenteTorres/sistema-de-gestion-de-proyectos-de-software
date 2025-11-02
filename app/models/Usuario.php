@@ -9,7 +9,7 @@ class Usuario {
     }
 
     public function login($correo, $contrasena) {
-        $sql = "SELECT u.id_usuario, u.nombre, u.contrasena, r.nombre as rol
+        $sql = "SELECT u.id_usuario, u.nombre, u.correo, u.contrasena, u.id_rol, r.nombre as rol
                 FROM usuarios u
                 JOIN roles r ON u.id_rol = r.id_rol
                 WHERE u.correo = :correo AND u.activo = 1

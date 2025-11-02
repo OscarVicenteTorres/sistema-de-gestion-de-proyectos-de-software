@@ -446,4 +446,129 @@ class Tarea {
             'estados' => self::ESTADOS_PERMITIDOS
         ];
     }
+
+    /**
+     * Obtiene todas las tareas de un proyecto específico
+     * Ordenadas por fecha límite y estado
+     * 
+     * @param int $id_proyecto - ID del proyecto
+     * @return array - Array con todas las tareas del proyecto
+     */
+    public function obtenerTareasPorProyecto($id_proyecto) {
+        try {
+            $sql = "SELECT 
+                        t.id_tarea,
+                        t.titulo,
+                        t.descripcion,
+                        t.area_asignada,
+                        t.fecha_inicio,
+                        t.fecha_limite,
+                        t.estado,
+                        t.porcentaje_avance,
+                        t.fecha_creacion,
+                        u.nombre as usuario_nombre,
+                        u.apellido as usuario_apellido
+                    FROM tareas t
+                    LEFT JOIN usuarios u ON t.id_usuario = u.id_usuario
+                    WHERE t.id_proyecto = :id_proyecto
+                    ORDER BY 
+                        CASE 
+                            WHEN t.estado = 'Completado' THEN 2
+                            ELSE 1
+                        END ASC,
+                        t.fecha_limite ASC,
+                        t.fecha_creacion DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id_proyecto', $id_proyecto, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al obtener tareas por proyecto: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene el historial de notas/avances de una tarea
+     * 
+     * @param int $id_tarea - ID de la tarea
+     * @return array - Array con todas las notas de la tarea
+     */
+    public function obtenerNotasTarea($id_tarea) {
+        try {
+            $sql = "SELECT 
+                        id_nota,
+                        id_tarea,
+                        porcentaje_anterior,
+                        porcentaje_nuevo,
+                        nota_desarrollador,
+                        fecha_envio
+                    FROM notas_tareas
+                    WHERE id_tarea = :id_tarea
+                    ORDER BY fecha_envio DESC";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id_tarea', $id_tarea, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al obtener notas de tarea: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Guarda una nota/avance de tarea
+     * 
+     * @param array $datos - Datos de la nota: id_tarea, porcentaje_anterior, porcentaje_nuevo, nota_desarrollador
+     * @return array - ['exito' => bool, 'mensaje' => string, 'id' => int|null]
+     */
+    public function guardarNotaTarea($datos) {
+        try {
+            $sql = "INSERT INTO notas_tareas (
+                        id_tarea,
+                        porcentaje_anterior,
+                        porcentaje_nuevo,
+                        nota_desarrollador
+                    ) VALUES (
+                        :id_tarea,
+                        :porcentaje_anterior,
+                        :porcentaje_nuevo,
+                        :nota_desarrollador
+                    )";
+            
+            $stmt = $this->conn->prepare($sql);
+            
+            $params = [
+                ':id_tarea' => $datos['id_tarea'],
+                ':porcentaje_anterior' => $datos['porcentaje_anterior'] ?? 0,
+                ':porcentaje_nuevo' => $datos['porcentaje_nuevo'] ?? 0,
+                ':nota_desarrollador' => $datos['nota_desarrollador'] ?? ''
+            ];
+            
+            $resultado = $stmt->execute($params);
+            
+            if ($resultado) {
+                return [
+                    'exito' => true,
+                    'mensaje' => 'Nota guardada exitosamente',
+                    'id' => $this->conn->lastInsertId()
+                ];
+            } else {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'Error al guardar la nota'
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log("Error al guardar nota de tarea: " . $e->getMessage());
+            return [
+                'exito' => false,
+                'mensaje' => 'Error interno del servidor'
+            ];
+        }
+    }
 }

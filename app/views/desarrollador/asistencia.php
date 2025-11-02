@@ -15,6 +15,9 @@
         <p>Bienvenido, <?php echo htmlspecialchars($usuario['nombre']); ?> 👋</p>
 
         <div class="btns-asistencia">
+            <a href="?c=Usuario&a=dashboard" class="btn-asistencia" style="display: inline-block; text-decoration: none; text-align: center; padding: 14px 45px; background: #1E2746; color: var(--color-primary); font-weight: 600; border: none; border-radius: 15px; cursor: pointer;">
+                <i class="fas fa-arrow-right"></i> Ir al Dashboard
+            </a>
             <form method="POST" action="?c=Asistencia&a=registrarEntrada">
                 <button type="submit" class="btn-asistencia btn-entrada">Registrar Entrada</button>
             </form>
@@ -51,31 +54,17 @@
         </div>
     </div>
 
-    <?php if (isset($_SESSION['mensaje_exito'])): ?>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: '¡Entrada confirmada!',
-                text: '<?php echo $_SESSION['mensaje_exito']; ?>',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: true,
-                willClose: () => {
-                    // Redirigir automáticamente al dashboard del desarrollador
-                    window.location.href = "?c=Dashboard&a=index";
-                }
-            });
-        </script>
-        <?php unset($_SESSION['mensaje_exito']); ?>
-    <?php elseif (isset($_SESSION['mensaje_error'])): ?>
+    <?php if (isset($_SESSION['mensaje_error'])): ?>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
             Swal.fire({
                 icon: 'warning',
                 title: 'Atención',
                 text: '<?php echo $_SESSION['mensaje_error']; ?>',
-                confirmButtonText: 'Aceptar'
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#FFD700',
+                allowOutsideClick: false,
+                allowEscapeKey: false
             });
         </script>
         <?php unset($_SESSION['mensaje_error']); ?>
