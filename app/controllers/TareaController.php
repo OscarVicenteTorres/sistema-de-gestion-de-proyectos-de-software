@@ -201,5 +201,212 @@ class TareaController extends BaseApiController {
 
         return $sanitizado;
     }
+
+    /**
+     * NUEVA FUNCIÓN: Guardar avance de una tarea desde el dashboard del desarrollador
+     * Actualiza: porcentaje_avance, estado, crea nota de avance, recalcula proyecto
+     */
+    public function guardarAvance()
+    {
+        AuthMiddleware::verificarSesion();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            exit;
+        }
+
+        $id_tarea = $_POST['id_tarea'] ?? 0;
+        $porcentaje_nuevo = $_POST['porcentaje_nuevo'] ?? 0;
+        $nota = $_POST['nota_desarrollador'] ?? '';
+
+        // Validaciones
+        if (empty($id_tarea) || $porcentaje_nuevo < 0 || $porcentaje_nuevo > 100) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Datos inválidos']);
+            exit;
+        }
+
+        try {
+            $tareaModel = new Tarea();
+            require_once __DIR__ . '/../models/Proyecto.php';
+            $proyectoModel = new Proyecto();
+
+            // 1. Obtener tarea actual para conseguir porcentaje anterior
+            $tarea = $tareaModel->obtenerPorId($id_tarea);
+            if (!$tarea) {
+                http_response_code(404);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Tarea no encontrada']);
+                exit;
+            }
+
+            // 2. Guardar nota de avance en tabla notas_tareas
+            $notaData = [
+                'id_tarea' => $id_tarea,
+                'porcentaje_anterior' => $tarea['porcentaje_avance'],
+                'porcentaje_nuevo' => $porcentaje_nuevo,
+                'nota_desarrollador' => $nota
+            ];
+            $resultadoNota = $tareaModel->guardarNotaTarea($notaData);
+
+            if (!$resultadoNota['exito']) {
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Error al guardar la nota']);
+                exit;
+            }
+
+            // 3. Actualizar porcentaje_avance y estado de la tarea
+            $nuevoEstado = 'Pendiente';
+            if ($porcentaje_nuevo > 0 && $porcentaje_nuevo < 100) {
+                $nuevoEstado = 'En Progreso';
+            } elseif ($porcentaje_nuevo >= 100) {
+                $nuevoEstado = 'Completado';
+            }
+
+            $datosActualizar = [
+                'titulo' => $tarea['titulo'],
+                'descripcion' => $tarea['descripcion'],
+                'id_usuario' => $tarea['id_usuario'],
+                'area_asignada' => $tarea['area_asignada'],
+                'fecha_inicio' => $tarea['fecha_inicio'],
+                'fecha_limite' => $tarea['fecha_limite'],
+                'estado' => $nuevoEstado,
+                'porcentaje_avance' => $porcentaje_nuevo
+            ];
+
+            $resultadoActualizacion = $tareaModel->actualizar($id_tarea, $datosActualizar);
+
+            if (!$resultadoActualizacion['exito']) {
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Error al actualizar la tarea']);
+                exit;
+            }
+
+            // 4. Recalcular porcentaje del proyecto
+            $id_proyecto = $tarea['id_proyecto'];
+            $proyectoModel->actualizarProgreso($id_proyecto);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Avance guardado exitosamente',
+                'porcentaje_nuevo' => $porcentaje_nuevo,
+                'estado' => $nuevoEstado
+            ]);
+            exit;
+
+        } catch (Exception $e) {
+            error_log("Error en guardarAvance: " . $e->getMessage());
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
+            exit;
+        }
+    }
+
+    /**
+     * NUEVA FUNCIÓN: Obtener tareas completadas de un usuario
+     */
+    public function obtenerTareasCompletadas()
+    {
+        AuthMiddleware::verificarSesion();
+
+        $id_usuario = $_GET['id_usuario'] ?? ($_SESSION['usuario']['id_usuario'] ?? 0);
+
+        if (empty($id_usuario)) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'ID de usuario inválido']);
+            exit;
+        }
+
+        try {
+            $tareaModel = new Tarea();
+
+            $sql = "SELECT 
+                        t.id_tarea,
+                        t.titulo,
+                        t.descripcion,
+                        t.area_asignada,
+                        t.fecha_limite,
+                        t.estado,
+                        t.porcentaje_avance,
+                        p.nombre as proyecto_nombre,
+                        COUNT(n.id_nota) as total_notas
+                    FROM tareas t
+                    INNER JOIN proyectos p ON t.id_proyecto = p.id_proyecto
+                    LEFT JOIN notas_tareas n ON t.id_tarea = n.id_tarea
+                    WHERE t.id_usuario = :id_usuario AND t.porcentaje_avance = 100
+                    GROUP BY t.id_tarea
+                    ORDER BY t.fecha_limite DESC";
+
+            // Acceso a la conexión a través de Reflection
+            $reflection = new \ReflectionClass('Tarea');
+            $prop = $reflection->getProperty('conn');
+            $prop->setAccessible(true);
+            $conn = $prop->getValue($tareaModel);
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $tareasCompletadas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'tareas_completadas' => $tareasCompletadas
+            ]);
+            exit;
+
+        } catch (Exception $e) {
+            error_log("Error en obtenerTareasCompletadas: " . $e->getMessage());
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
+            exit;
+        }
+    }
+
+    /**
+     * NUEVA FUNCIÓN: Obtener notas de una tarea
+     */
+    public function obtenerNotasTarea()
+    {
+        AuthMiddleware::verificarSesion();
+
+        $id_tarea = $_GET['id_tarea'] ?? 0;
+
+        if (empty($id_tarea)) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'ID de tarea inválido']);
+            exit;
+        }
+
+        try {
+            $tareaModel = new Tarea();
+            $notas = $tareaModel->obtenerNotasTarea($id_tarea);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'notas' => $notas
+            ]);
+            exit;
+
+        } catch (Exception $e) {
+            error_log("Error en obtenerNotasTarea: " . $e->getMessage());
+            http_response_code(500);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
+            exit;
+        }
+    }
 }
 ?>

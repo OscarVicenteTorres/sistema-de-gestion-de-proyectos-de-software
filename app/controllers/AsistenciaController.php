@@ -57,21 +57,15 @@ class AsistenciaController extends Controller
         $resultado = $this->asistenciaModel->registrarEntrada($usuario_id);
 
         if ($resultado) {
-            $_SESSION['mensaje_exito'] = "¡Entrada confirmada! Tu entrada ha sido registrada con éxito.";
-
-            // 🔹 Redirigir al dashboard del desarrollador
-            header('Location: ?c=Usuario&a=dashboardDesarrollador');
+            // Si la entrada se registró exitosamente, ir directamente al dashboard
+            header('Location: ?c=Usuario&a=dashboard');
             exit;
         } else {
+            // Si ya registró entrada, mostrar alerta pero seguir en asistencia
             $_SESSION['mensaje_error'] = "Ya registraste tu entrada hoy.";
-
-            // Si ya marcó asistencia, permanecer en la página
-            header('Location: ?c=Usuario&a=dashboardDesarrollador');
+            header('Location: ?c=Asistencia&a=index');
             exit;
         }
-
-        header('Location: ?c=Asistencia&a=index');
-        exit;
     }
 
     /**
@@ -92,13 +86,9 @@ class AsistenciaController extends Controller
         $resultado = $this->asistenciaModel->registrarSalida($usuario_id);
 
         if ($resultado) {
-            $_SESSION['mensaje'] = "Salida registrada correctamente.";
-            header('Location: ?c=Auth&a=login');
-            exit;
+            $_SESSION['mensaje_exito'] = "¡Salida registrada correctamente! Que tengas un excelente día.";
         } else {
-            $_SESSION['mensaje'] = "Error al registrar la salida.";
-            header('Location: ?c=Auth&a=login');
-            exit;
+            $_SESSION['mensaje_error'] = "Error al registrar la salida. Intenta nuevamente.";
         }
 
         header('Location: ?c=Asistencia&a=index');

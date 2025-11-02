@@ -204,7 +204,7 @@ class ProyectoController extends Controller
 
     public function obtenerProyectosPorUsuario($id_usuario)
     {
-        $sql = "SELECT 
+        $sql = "SELECT DISTINCT
                 p.id_proyecto,
                 p.nombre,
                 p.descripcion,
@@ -216,7 +216,6 @@ class ProyectoController extends Controller
             FROM proyectos p
             INNER JOIN tareas t ON p.id_proyecto = t.id_proyecto
             WHERE t.id_usuario = :id_usuario
-            GROUP BY p.id_proyecto
             ORDER BY p.fecha_inicio DESC";
 
         $stmt = $this->db->prepare($sql);
@@ -233,7 +232,7 @@ class ProyectoController extends Controller
         $usuarioId = $_SESSION['usuario']['id_usuario'] ?? null;
 
         if (!$usuarioId) {
-            header('Location: index.php?c=Auth&a=login');
+            header('Location: ?c=Auth&a=login');
             exit;
         }
 

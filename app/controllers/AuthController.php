@@ -18,6 +18,7 @@ class AuthController extends Controller
                     'id_usuario' => $usuario['id_usuario'],
                     'nombre' => $usuario['nombre'],
                     'correo' => $usuario['correo'],
+                    'id_rol' => $usuario['id_rol'],  // ✅ Agregado
                     'rol' => $usuario['rol']
                 ];
 

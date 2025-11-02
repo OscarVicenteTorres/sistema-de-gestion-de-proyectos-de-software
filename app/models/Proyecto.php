@@ -261,7 +261,7 @@ class Proyecto
 
     public function obtenerProyectosPorUsuario($id_usuario)
     {
-        $sql = "SELECT 
+        $sql = "SELECT DISTINCT
                 p.id_proyecto,
                 p.nombre,
                 p.descripcion,
@@ -273,7 +273,6 @@ class Proyecto
             FROM proyectos p
             INNER JOIN tareas t ON p.id_proyecto = t.id_proyecto
             WHERE t.id_usuario = :id_usuario
-            GROUP BY p.id_proyecto
             ORDER BY p.fecha_inicio DESC";
 
         $stmt = $this->db->prepare($sql);

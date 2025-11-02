@@ -1,54 +1,601 @@
-/* Página: Dashboard del desarrollador */
+/* ================================
+   Página: Dashboard del Desarrollador
+   ================================ */
 
-body.bg-light {
-    background-color: #f5f6fa !important;
+:root {
+    --dorado: #979797;
+    --dorado-oscuro: #000000;
+    --azul-oscuro: #1F2937;
+    --gris-claro: #F3F4F6;
+    --verde-completado: #10B981;
+    --rojo-vencido: #EF4444;
+    --amarillo-pendiente: #FBBF24;
+    --azul-progreso: #3B82F6;
+}
+
+/* ================================
+   Estructura General
+   ================================ */
+
+body {
     font-family: 'Poppins', sans-serif;
+    background-color: #f5f6fa;
 }
 
-.project-card {
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: 25px;
-    padding: 20px;
-}
-
-.project-header {
+.dashboard-container {
     display: flex;
-    justify-content: space-between;
+    min-height: 100vh;
+    background-color: #f5f6fa;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.main-header {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid var(--dorado);
+}
+
+.header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
     align-items: center;
 }
 
-.project-title {
+.header-actions .btn {
     font-weight: 600;
-    font-size: 1.2rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }
 
-.badge {
+.header-actions .btn-success {
+    background-color: var(--verde-completado);
+    border-color: var(--verde-completado);
+}
+
+.header-actions .btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.header-actions .btn-outline-primary {
+    color: var(--azul-progreso);
+    border-color: var(--azul-progreso);
+}
+
+.header-actions .btn-outline-primary:hover {
+    background-color: var(--azul-progreso);
+    border-color: var(--azul-progreso);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* ================================
+   Sección de Proyectos
+   ================================ */
+
+.projects-section {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--dorado);
+}
+
+.projects-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+}
+
+/* ================================
+   Encabezado del Proyecto
+   ================================ */
+
+.project-header-dev {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.project-header-dev:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.project-header-dev .fw-bold {
+    color: var(--azul-oscuro);
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-header-dev i {
+    color: var(--dorado);
+}
+
+.project-header-dev .badge {
     font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
 }
 
-.progress {
-    height: 10px;
+/* Barra de Progreso del Proyecto */
+.project-header-dev .progress {
+    height: 12px;
+    background-color: #e5e7eb;
     border-radius: 10px;
+    overflow: hidden;
 }
 
-.tarea {
-    background: var(--color-background);
+.project-header-dev .progress-bar {
+    background: linear-gradient(to right, var(--dorado), var(--dorado-oscuro));
     border-radius: 10px;
-    padding: 10px 15px;
-    margin-top: 10px;
+    transition: width 0.6s ease;
 }
 
-.tarea small {
-    color: #6c757d;
+/* ================================
+   Lista de Tareas
+   ================================ */
+
+.tasks-list-dev {
+    margin-top: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--dorado);
 }
 
-.estado {
+.tasks-list-dev h6 {
+    color: var(--azul-oscuro);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tasks-list-dev h6 i {
+    color: var(--dorado);
+}
+
+/* ================================
+   Tarjeta de Tarea
+   ================================ */
+
+.tarea-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.tarea-card:hover {
+    background-color: #fff;
+    border-left-color: var(--dorado);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
+    transform: translateX(4px);
+}
+
+.tarea-card strong {
+    color: var(--azul-oscuro);
+    font-weight: 600;
+}
+
+.tarea-card h6 {
+    color: var(--azul-oscuro);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.tarea-card .badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.tarea-card .text-muted {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Barra de Progreso de Tarea */
+.tarea-card .progress {
+    height: 20px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0.75rem 0;
+}
+
+.tarea-card .progress-bar {
+    background: linear-gradient(to right, #3B82F6, #60a5fa);
+    border-radius: 10px;
     font-weight: bold;
+    font-size: 12px;
+    transition: width 0.6s ease;
 }
 
-.estado.pendiente { color: #ffc107; }
-.estado.en-progreso { color: #0d6efd; }
-.estado.completado { color: #198754; }
-.estado.vencido { color: #dc3545; }
+/* Botones de Acción en Tarea */
+.tarea-card .btn-outline-secondary {
+    color: #6B7280;
+    border-color: #D1D5DB;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.tarea-card .btn-outline-secondary:hover {
+    background-color: #374151;
+    border-color: #374151;
+    color: white;
+    transform: scale(1.05);
+}
+
+.tarea-card .btn-success {
+    background-color: var(--verde-completado);
+    border-color: var(--verde-completado);
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.tarea-card .btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ================================
+   Alertas
+   ================================ */
+
+.alert {
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid var(--azul-progreso);
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border-left: 4px solid var(--verde-completado);
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid var(--amarillo-pendiente);
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid var(--rojo-vencido);
+}
+
+/* ================================
+   Modales
+   ================================ */
+
+.modal-header {
+    background-color: var(--azul-oscuro) !important;
+    border: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-header h2 {
+    color: var(--dorado) !important;
+    font-weight: 700;
+}
+
+.modal-header .close-modal-btn {
+    color: white !important;
+}
+
+.modal-header.bg-success {
+    background-color: var(--verde-completado) !important;
+}
+
+.modal-header.bg-success h2 {
+    color: white !important;
+}
+
+.modal-body {
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-body h6,
+.modal-body strong,
+.modal-body .fw-bold {
+    color: var(--azul-oscuro) !important;
+}
+
+.modal-body p,
+.modal-body .text-muted {
+    color: #6b7280 !important;
+}
+
+/* Modal de Fases - Tamaño específico */
+.modal-fases {
+    max-width: 500px !important;
+}
+
+.modal-fases .modal-body {
+    background-color: #f8f9fa !important;
+}
+
+/* Modal de Tareas Completadas - Más grande */
+#modalTareasCompletadas {
+    max-width: 800px !important;
+}
+
+/* Modal de Avance - Grande para el formulario */
+#modalAvanceTarea {
+    max-width: 700px !important;
+}
+
+/* Modal de Detalles - Grande */
+#modalDetallesTarea {
+    max-width: 800px !important;
+}
+
+/* ================================
+   Formulario del Modal
+   ================================ */
+
+.form-label {
+    color: var(--azul-oscuro);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.form-label i {
+    color: var(--dorado);
+}
+
+.form-control,
+.form-select {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+.form-range {
+    height: 6px;
+    border-radius: 3px;
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    width: 20px;
+    height: 20px;
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    width: 20px;
+    height: 20px;
+}
+
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.125em;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.form-check-input:checked {
+    background-color: var(--dorado);
+    border-color: var(--dorado);
+}
+
+.form-check-input:focus {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.25);
+}
+
+/* ================================
+   Badges
+   ================================ */
+
+.badge-completado {
+    background-color: var(--verde-completado) !important;
+    color: white !important;
+}
+
+.badge-pendiente {
+    background-color: var(--amarillo-pendiente) !important;
+    color: var(--azul-oscuro) !important;
+}
+
+.badge-progreso {
+    background-color: var(--azul-progreso) !important;
+    color: white !important;
+}
+
+.badge-vencido {
+    background-color: var(--rojo-vencido) !important;
+    color: white !important;
+}
+
+/* ================================
+   Responsive
+   ================================ */
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+    }
+
+    .projects-table-container {
+        padding: 1rem;
+    }
+
+    .project-header-dev {
+        margin-bottom: 1rem;
+    }
+
+    .task-card-dev {
+        margin-bottom: 1rem;
+    }
+
+    .header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .section-title {
+        font-size: 1.35rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+}
+
+/* ================================
+   Animaciones y Transiciones
+   ================================ */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.project-header-dev,
+.task-card-dev {
+    animation: slideIn 0.4s ease-out;
+}
+
+/* ================================
+   Spinner de Carga
+   ================================ */
+
+.spinner-border {
+    color: var(--dorado) !important;
+}
+
+/* ================================
+   Cartas de Información
+   ================================ */
+
+.card {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--azul-oscuro);
+    font-weight: 700;
+}
+
+.card-text {
+    color: #6b7280;
+}
+
+/* ================================
+   Títulos y Textos
+   ================================ */
+
+.fw-bold {
+    font-weight: 700;
+}
+
+.fw-semibold {
+    font-weight: 600;
+}
+
+.text-muted {
+    color: #9ca3af !important;
+}
+
+/* ================================
+   Sombras Personalizadas
+   ================================ */
+
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
