@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
     <!-- Single CSS entrypoint -->
     <link rel="stylesheet" href="<?php echo asset('css/main.css'); ?>">
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Barra Lateral de Navegación -->
@@ -48,9 +50,24 @@
 
             <h2>Resumen de Proyectos</h2>
             <div class="stats">
-                <div class="card total">Totales: <span><?= $estadisticas['total_registrados'] ?? 0 ?></span></div>
-                <div class="card activos">En Curso: <span><?= $estadisticas['en_curso'] ?? 0 ?></span></div>
-                <div class="card completados">Completados: <span><?= $estadisticas['completados'] ?? 0 ?></span></div>
+                <div class="col-md-4">
+                    <div class="card border-warning border-3">
+                        <h6 class="text-warning fw-bold">Totales</h6>
+                        <h2 class="text-warning fw-bold mb-0" id="statProyectosRegistrados"><span><?= $estadisticas['total_registrados'] ?? 0 ?></span></h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-warning border-3">
+                        <h6 class="text-warning fw-bold">En Curso</h6>
+                        <h2 class="text-warning fw-bold mb-0" id="statProyectosRegistrados"><span><?= $estadisticas['en_curso'] ?? 0 ?></span></h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-warning border-3">
+                        <h6 class="text-warning fw-bold">Completados</h6>
+                        <h2 class="text-warning fw-bold mb-0" id="statProyectosRegistrados"><span><?= $estadisticas['completados'] ?? 0 ?></span></h2>
+                    </div>
+                </div>
             </div>
 
             <h3>Listado de Proyectos</h3>
@@ -119,4 +136,5 @@
 
         <script src="<?php echo asset('js/exportar.js'); ?>"></script>
 </body>
+
 </html>

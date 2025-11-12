@@ -1,78 +1,11 @@
 /* Página: Exportar proyectos */
 
 .exportar-container {
-    padding: 20px;
+    flex: 1; 
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 40px;
+    background: var(--color-background) !important;
+    overflow-x: hidden;
 }
 
-/* Botón exportar */
-.btn-exportar {
-    margin-top: 20px;
-    background-color: #17a2b8;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-exportar:hover {
-    background-color: #138496;
-    transform: translateY(-2px);
-}
-
-.btn-dark {
-    background-color: var(--color-dark) !important;
-    border: none;
-    border-radius: 8px;
-}
-
-.btn-dark:hover {
-    background-color: var(--color-primary) !important;
-    color: #000;
-}
-
-/* Formato en modal */
-.formato {
-    margin: 20px 0;
-}
-
-.formato label {
-    font-weight: 600;
-    margin-right: 10px;
-}
-
-.formato select {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--color-border);
-}
-
-.btn-confirmar {
-    background-color: var(--color-primary);
-    color: var(--color-dark);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-confirmar:hover {
-    background-color: var(--color-secondary);
-    transform: translateY(-2px);
-}
-
-.cerrar {
-    float: right;
-    cursor: pointer;
-    font-size: 20px;
-    color: #666;
-    transition: all 0.3s ease;
-}
-
-.cerrar:hover {
-    color: #333;
-    transform: rotate(90deg);
-}

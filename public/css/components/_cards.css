@@ -135,6 +135,16 @@
     color: var(--color-text-primary);
 }
 
+/* Tarjetas de exportar */
+.card {
+    flex: 1;
+    padding: 15px;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: bold;
+    
+}
+
 /* Tarjetas de usuario */
 .user-item {
     background: white;
@@ -206,20 +216,6 @@
     padding: 4px 12px;
     border-radius: 12px;
 }
-
-/* Tarjetas de exportar */
-.card {
-    flex: 1;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: bold;
-    color: white;
-}
-
-.card.total { background-color: #007bff; }
-.card.activos { background-color: #28a745; }
-.card.completados { background-color: #ffc107; }
 
 /* Responsive */
 @media (max-width: 992px) {

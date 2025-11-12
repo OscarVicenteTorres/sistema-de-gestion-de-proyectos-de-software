@@ -15,25 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Single CSS entrypoint -->
     <link rel="stylesheet" href="<?php echo asset('css/main.css'); ?>">
-    <style>
-        
-        .vista-inicial { display: block; }
-        .vista-tareas { display: none; }
-        .proyecto-seleccionado {
-            background: linear-gradient(135deg, #f0ad4e 0%, #ec971f 100%);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 8px rgba(240, 173, 78, 0.3);
-        }
-        .proyecto-seleccionado.active { display: flex; }
-        .proyecto-seleccionado h3 { margin: 0; font-size: 1.25rem; }
-        .proyecto-seleccionado .btn { background: white; color: #f0ad4e; border: none; }
-    </style>
 </head>
 
 <body>
