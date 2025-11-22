@@ -1,14 +1,17 @@
 <?php
 require_once __DIR__ . "/../config/database.php";
 
-class Usuario {
+class Usuario
+{
     private $conn;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->conn = Database::connect();
     }
 
-    public function login($correo, $contrasena) {
+    public function login($correo, $contrasena)
+    {
         $sql = "SELECT u.id_usuario, u.nombre, u.contrasena, r.nombre as rol
                 FROM usuarios u
                 JOIN roles r ON u.id_rol = r.id_rol
@@ -25,7 +28,8 @@ class Usuario {
         return false;
     }
 
-    public function obtenerTodos($filtros = []) { 
+    public function obtenerTodos($filtros = [])
+    {
         $sql = "SELECT u.*, 
                        r.nombre as rol_nombre,
                        CASE 
@@ -35,17 +39,17 @@ class Usuario {
                        u.id_usuario
                 FROM usuarios u
                 LEFT JOIN roles r ON u.id_rol = r.id_rol";
-        
+
         $condiciones = [];
         $parametros = [];
 
-        
+
         if (!empty($filtros['area_trabajo'])) {
             // Usar búsqueda LIKE case-insensitive para evitar problemas de mayúsculas/minúsculas
             $condiciones[] = "LOWER(u.area_trabajo) LIKE :area_trabajo";
             $parametros[':area_trabajo'] = '%' . strtolower($filtros['area_trabajo']) . '%';
         }
-        
+
         // Por defecto no forzamos filtrar por activo; permitimos devolver ambos estados
         // Si se pasa el filtro 'activo' lo aplicamos como condición
         if (isset($filtros['activo'])) {
@@ -55,9 +59,9 @@ class Usuario {
         if (!empty($condiciones)) {
             $sql .= " WHERE " . implode(" AND ", $condiciones);
         }
-        
+
         $sql .= " ORDER BY u.nombre ASC";
-        
+
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($parametros);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -67,7 +71,8 @@ class Usuario {
      * Desvincula (pone NULL) las tareas asignadas a un usuario antes de eliminarlo.
      * Esto preserva el historial de tareas sin eliminar registros.
      */
-    public function desvincularTareas($id) {
+    public function desvincularTareas($id)
+    {
         $sql = "UPDATE tareas SET id_usuario = NULL WHERE id_usuario = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
@@ -78,7 +83,8 @@ class Usuario {
      * Elimina un usuario dentro de una transacción: desvincula tareas y elimina el registro.
      * Esto asegura consistencia: si falla la eliminación, se revierte la desvinculación.
      */
-    public function eliminarConTransaccion($id) {
+    public function eliminarConTransaccion($id)
+    {
         try {
             $this->conn->beginTransaction();
 
@@ -101,7 +107,8 @@ class Usuario {
         }
     }
 
-    public function obtenerPorId($id) {
+    public function obtenerPorId($id)
+    {
         $sql = "SELECT u.*, 
                        r.nombre as rol_nombre,
                        u.id_rol as id_rol,
@@ -114,27 +121,28 @@ class Usuario {
         $stmt->bindParam(':id', $id);
         $stmt->execute();
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         // Agregar campo para mostrar contraseña (solo para vista)
         if ($usuario) {
             // Por seguridad, mostrar solo asteriscos
             $usuario['contrasena_visible'] = '********';
         }
-        
+
         return $usuario;
     }
 
-    public function crear($datos) {
+    public function crear($datos)
+    {
         $sql = "INSERT INTO usuarios (nombre, apellido, documento, tipo_documento, correo, 
                 telefono, area_trabajo, fecha_inicio, contrasena, tecnologias, id_rol, activo)
                 VALUES (:nombre, :apellido, :documento, :tipo_documento, :correo,
                 :telefono, :area_trabajo, :fecha_inicio, :contrasena, :tecnologias, :id_rol, :activo)";
-        
+
         $stmt = $this->conn->prepare($sql);
-        
+
         // Hash de la contraseña
         $contrasenaHash = password_hash($datos['contrasena'], PASSWORD_DEFAULT);
-        
+
         $stmt->bindParam(':nombre', $datos['nombre']);
         $stmt->bindParam(':apellido', $datos['apellido']);
         $stmt->bindParam(':documento', $datos['documento']);
@@ -147,15 +155,16 @@ class Usuario {
         $stmt->bindParam(':tecnologias', $datos['tecnologias']);
         $stmt->bindParam(':id_rol', $datos['id_rol']);
         $stmt->bindParam(':activo', $datos['activo']);
-        
+
         return $stmt->execute();
     }
 
-    public function actualizar($id, $datos) {
+    public function actualizar($id, $datos)
+    {
         // Construir la consulta dinámicamente según los datos proporcionados
         $campos = [];
         $valores = [];
-        
+
         if (isset($datos['nombre'])) {
             $campos[] = "nombre = :nombre";
             $valores[':nombre'] = $datos['nombre'];
@@ -200,19 +209,20 @@ class Usuario {
             $campos[] = "contrasena = :contrasena";
             $valores[':contrasena'] = password_hash($datos['contrasena'], PASSWORD_DEFAULT);
         }
-        
+
         if (empty($campos)) {
             return false;
         }
-        
+
         $sql = "UPDATE usuarios SET " . implode(", ", $campos) . " WHERE id_usuario = :id";
         $valores[':id'] = $id;
-        
+
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute($valores);
     }
 
-    public function actualizarEstado($id, $estado) {
+    public function actualizarEstado($id, $estado)
+    {
         $sql = "UPDATE usuarios SET activo = :estado WHERE id_usuario = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':estado', $estado);
@@ -220,7 +230,8 @@ class Usuario {
         return $stmt->execute();
     }
 
-    public function contarTareasAsignadas($id) {
+    public function contarTareasAsignadas($id)
+    {
         $sql = "SELECT COUNT(*) as total FROM tareas WHERE id_usuario = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
@@ -229,10 +240,24 @@ class Usuario {
         return (int)($result['total'] ?? 0);
     }
 
-    public function eliminar($id) {
+    public function eliminar($id)
+    {
         $sql = "DELETE FROM usuarios WHERE id_usuario = :id";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
+    }
+
+    public function obtenerUsuariosPorProyecto($id_proyecto)
+    {
+        $sql = "SELECT DISTINCT u.nombre
+            FROM usuarios u
+            INNER JOIN tareas t ON t.id_usuario = u.id_usuario
+            WHERE t.id_proyecto = :id_proyecto";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id_proyecto", $id_proyecto);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

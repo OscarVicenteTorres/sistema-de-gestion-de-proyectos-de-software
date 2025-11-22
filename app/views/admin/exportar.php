@@ -29,8 +29,8 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="?c=Usuario&a=dashboardAdmin"><i class="fa-regular fa-folder"></i> Proyectos</a></li>
-                    <li><a href="?c=Tarea&a=index" class="active"><i class="fa-regular fa-calendar-check"></i> Tareas</a></li>
-                    <li><a href="?c=Proyecto&a=exportar"><i class="fa-solid fa-chart-line"></i> Exportar</a></li>
+                    <li><a href="?c=Tarea&a=index"><i class="fa-regular fa-calendar-check"></i> Tareas</a></li>
+                    <li><a href="?c=Proyecto&a=exportar" class="active"><i class="fa-solid fa-chart-line"></i> Exportar</a></li>
                     <li><a href="?c=Usuario&a=index"><i class="fa-regular fa-user"></i> Cuentas</a></li>
                 </ul>
             </nav>
@@ -70,71 +70,95 @@
                 </div>
             </div>
 
-            <h3>Listado de Proyectos</h3>
-            <table class="tabla-proyectos">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Herramienta</th>
-                        <th>Avance</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($proyectos)): ?>
-                        <?php foreach ($proyectos as $index => $p): ?>
-                            <tr>
-                                <td><?= $index + 1 ?></td>
-                                <td><?= htmlspecialchars($p['nombre']) ?></td>
-                                <td><?= htmlspecialchars($p['categoria'] ?? 'N/A') ?></td>
-                                <td><?= htmlspecialchars($p['porcentaje_avance'] ?? 0) ?>%</td>
-                                <td><?= htmlspecialchars($p['estado']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+            <div class="container mt-4">
+
+                <h2 class="fw-bold mb-4">Reporte de Proyectos</h2>
+
+                <table class="table table-bordered table-hover" id="tablaExportar">
+                    <thead class="table-dark">
                         <tr>
-                            <td colspan="5">No hay proyectos registrados.</td>
+                            <th>Nombre</th>
+                            <th>Herramienta</th>
+                            <th>Avance</th>
+                            <th>Estado</th>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="tablaExportarBody">
+                        <tr>
+                            <td colspan="4" class="text-center py-3">Cargando datos...</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <button id="btnExportar" class="btn-exportar">Exportar</button>
+            </div>
 
-            <!-- Popup Modal -->
-            <div id="modalExportar" class="modal">
-                <div class="modal-content">
-                    <span id="cerrarModal" class="cerrar">&times;</span>
-                    <h3>Seleccionar proyectos a exportar</h3>
-                    <form method="POST" action="exportar.php">
-                        <?php foreach ($proyectos as $p): ?>
-                            <label>
-                                <input type="checkbox" name="proyectos[]" value="<?= $p['id_proyecto'] ?>">
-                                <?= htmlspecialchars($p['nombre']) ?>
-                            </label><br>
-                        <?php endforeach; ?>
+            <!-- BOTÓN QUE ABRE EL MODAL -->
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exportarModal">
+                Exportar
+            </button>
 
-                        <div class="formato">
-                            <label>Formato:</label>
-                            <select name="formato">
-                                <option value="pdf">PDF</option>
-                                <option value="excel">Excel</option>
-                                <option value="csv">CSV</option>
-                            </select>
-                        </div>
+            <div class="modal fade" id="exportarModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
 
-                        <button type="submit" class="btn-confirmar">Exportar</button>
-                    </form>
+                        <!-- FORMULARIO REAL -->
+                        <form action="?c=Proyecto&a=exportarpdf" method="POST">
+
+                            <!-- HEADER -->
+                            <div class="modal-header bg-dark text-white">
+                                <h5 class="modal-title">Exportar Proyectos</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <!-- CUERPO -->
+                            <div class="modal-body">
+                                <?php foreach ($proyectos as $p): ?>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input"
+                                            type="checkbox"
+                                            name="proyectos[]"
+                                            value="<?= $p['id_proyecto'] ?>">
+                                        <label class="form-check-label">
+                                            <?= htmlspecialchars($p['nombre']) ?>
+                                            <small class="text-muted">
+                                                (<?= htmlspecialchars($p['estado']) ?>,
+                                                <?= htmlspecialchars($p['porcentaje_avance'] ?? $p['avance'] ?? '0') ?>%)
+                                            </small>
+                                        </label>
+                                    </div>
+                                <?php endforeach; ?>
+
+                                <hr>
+
+                                <label class="form-label fw-bold">Formato de exportación:</label>
+                                <select class="form-select" name="formato">
+                                    <option value="PDF">PDF</option>
+                                    <option value="CSV">CSV</option>
+                                </select>
+                            </div>
+
+                            <!-- FOOTER -->
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fa fa-download"></i> Exportar
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Cancelar
+                                </button>
+                            </div>
+
+                        </form> <!-- FIN DEL FORM -->
+                    </div>
                 </div>
             </div>
-        </div>
 
 
 
 
 
-        <script src="<?php echo asset('js/exportar.js'); ?>"></script>
+            <script src="<?php echo asset('js/exportar.js'); ?>"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

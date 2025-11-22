@@ -208,6 +208,8 @@ class Proyecto
         }
     }
 
+
+    //para exportar los proyectos 
     public function obtenerCompletados()
     {
         $sql = "SELECT 
@@ -281,5 +283,58 @@ class Proyecto
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Listar proyectos para exportar (Nombre, Herramienta, Avance y Estado)
+     */
+    public function listarParaExportar()
+    {
+        $sql = "SELECT 
+            id_proyecto,
+            nombre,
+            tecnologias AS herramienta,
+            porcentaje_avance AS avance,
+            estado
+        FROM proyectos
+        ORDER BY id_proyecto DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public function obtenerProyectosPorIds(array $ids)
+    {
+        if (empty($ids)) return [];
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "SELECT * FROM proyectos WHERE id_proyecto IN ($placeholders)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($ids);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerTareasPorProyecto($id_proyecto)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM tareas WHERE id_proyecto = ?");
+        $stmt->execute([$id_proyecto]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerHitosPorProyecto($id)
+    {
+        try {
+            $sql = "SELECT * FROM hitos WHERE id_proyecto = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Si la tabla no existe, no lanzar error, devolver vacío
+            return [];
+        }
     }
 }

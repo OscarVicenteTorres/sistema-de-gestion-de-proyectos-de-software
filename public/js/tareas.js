@@ -708,3 +708,30 @@ function renderizarResultadoFiltroTareas(tareas) {
     html += '</div>';
     cont.innerHTML = html;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    cargarProyectosExportar();
+});
+
+function cargarProyectosExportar() {
+    fetch("?c=Proyecto&a=listarAjax")
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("exportarTableBody");
+            tbody.innerHTML = "";
+
+            data.datos.forEach(p => {
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${p.nombre}</td>
+                    <td>${p.herramienta ?? "Sin dato"}</td>
+                    <td>${p.progreso}%</td>
+                    <td>${p.estado}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => console.error("Error cargando exportación:", err));
+}

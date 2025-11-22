@@ -1,0 +1,16 @@
+{
+    "name": "user/sistema-de-gestion-de-proyectos-de-software",
+    "authors": [
+        {
+            "name": "PedroDEv-dash",
+            "email": "pedrojoaquinadriansenflores@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Dompdf\\": "libraries/dompdf/src/"
+        }
+    }
+}

@@ -2,6 +2,10 @@
 require_once __DIR__ . '/../../core/Controller.php';
 require_once __DIR__ . '/../models/Proyecto.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+require_once __DIR__ . '/../../libraries/dompdf/vendor/autoload.php';
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class ProyectoController extends Controller
 {
@@ -189,15 +193,15 @@ class ProyectoController extends Controller
 
         $proyectoModel = new Proyecto();
 
-        // Obtener todos los proyectos completados
-        $proyectosCompletados = $proyectoModel->obtenerCompletados();
+        // Obtener TODOS los proyectos sin filtrar
+        $proyectos = $proyectoModel->listarParaExportar();
 
         // Obtener estadísticas generales
         $estadisticas = $proyectoModel->obtenerEstadisticas();
 
         // Enviar ambos a la vista
         $this->render('admin/exportar', [
-            'proyectos' => $proyectosCompletados,
+            'proyectos' => $proyectos,
             'estadisticas' => $estadisticas
         ]);
     }
@@ -226,28 +230,85 @@ class ProyectoController extends Controller
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
-    public function dashboard()
+    /**
+     * Obtener proyectos para la tabla de exportación (JSON)
+     */
+    public function obtenerProyectosJSON()
     {
-        session_start();
-        $usuarioId = $_SESSION['usuario']['id_usuario'] ?? null;
-
-        if (!$usuarioId) {
-            header('Location: index.php?c=Auth&a=login');
-            exit;
-        }
+        AuthMiddleware::verificarSesion();
 
         $proyectoModel = new Proyecto();
-        $tareaModel = new Tarea();
+        $proyectos = $proyectoModel->listarParaExportar();
 
-        // Obtener proyectos asignados al usuario
-        $proyectos = $proyectoModel->obtenerProyectosPorUsuario($usuarioId);
+        header('Content-Type: application/json');
+        echo json_encode($proyectos);
+        exit;
+    }
 
-        // Obtener tareas de cada proyecto
-        foreach ($proyectos as &$proyecto) {
-            $proyecto['tareas'] = $tareaModel->obtenerTareasPorProyecto($proyecto['id_proyecto']);
+    public function exportarpdf()
+    {
+        AuthMiddleware::verificarRol(['Admin', 'Gestor de Proyecto']);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            // 1. Cargar Dompdf correctamente
+            require_once __DIR__ . '/../../libraries/dompdf/vendor/autoload.php';
+            $dompdf = new Dompdf();
+
+            $ids = $_POST['proyectos'] ?? [];
+            $formato = $_POST['formato'] ?? 'PDF';
+
+            if (empty($ids)) {
+                $_SESSION['error'] = 'Debes seleccionar al menos un proyecto';
+                header('Location: ?c=Proyecto&a=exportar');
+                exit;
+            }
+
+            $proyectoModel = new Proyecto();
+            $proyectos = $proyectoModel->obtenerProyectosPorIds($ids);
+
+            if ($formato === 'PDF') {
+
+                // Generar HTML para el PDF
+                $html = '';
+                foreach ($proyectos as $proyecto) {
+                    $tareas = $proyectoModel->obtenerTareasPorProyecto($proyecto['id_proyecto']);
+                    $hitos = []; // No usar hitos, tabla no existe
+
+                    ob_start();
+                    include __DIR__ . '/../views/admin/plantilla_exportar_moderno.php';
+                    $html .= ob_get_clean();
+                }
+
+                // Enviar al PDF
+                $dompdf->loadHtml($html);
+                $dompdf->setPaper('A4', 'portrait');
+                $dompdf->render();
+                $dompdf->stream('Proyectos.pdf', ['Attachment' => true]);
+                exit;
+            } elseif ($formato === 'CSV') {
+
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="proyectos.csv"');
+
+                $output = fopen('php://output', 'w');
+                fputcsv($output, ['Nombre', 'Descripción', 'Fecha Inicio', 'Fecha Fin', 'Estado', 'Avance', 'Área', 'Cliente']);
+
+                foreach ($proyectos as $p) {
+                    fputcsv($output, [
+                        $p['nombre'],
+                        $p['descripcion'],
+                        $p['fecha_inicio'],
+                        $p['fecha_fin'],
+                        $p['estado'],
+                        $p['porcentaje_avance'] ?? 0,
+                        $p['categoria'] ?? $p['area'] ?? '',
+                        $p['cliente'] ?? ''
+                    ]);
+                }
+                fclose($output);
+                exit;
+            }
         }
-
-        include __DIR__ . '/../views/desarrollador/dashboard.php';
     }
 }

@@ -30,7 +30,7 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="?c=Usuario&a=dashboardAdmin"><i class="fa-regular fa-folder"></i> Proyectos</a></li>
+                    <li><a href="?c=Usuario&a=dashboardAdmin" class="active"><i class="fa-regular fa-folder"></i> Proyectos</a></li>
                     <li><a href="?c=Tarea&a=index"><i class="fa-regular fa-calendar-check"></i> Tareas</a></li>
                     <li><a href="?c=Proyecto&a=exportar"><i class="fa-solid fa-chart-line"></i> Exportar</a></li>
                     <li><a href="?c=Usuario&a=index"><i class="fa-regular fa-user"></i> Cuentas</a></li>
